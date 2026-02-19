@@ -17,6 +17,12 @@ export async function PUT(
   await connectToDatabase()
   const body = await req.json()
 
+  // Force hours to 0 for non-work day types
+  const noHoursTypes = ['vrij', 'ziek', 'feestdag']
+  if (body.type && noHoursTypes.includes(body.type)) {
+    body.hours = 0
+  }
+
   const day = await Day.findByIdAndUpdate(params.id, body, { new: true })
   if (!day) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
