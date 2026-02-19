@@ -184,25 +184,48 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
           </p>
         </div>
 
-        {/* Expand button */}
-        {isAdmin && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex-shrink-0 p-1.5 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--text-muted)] transition-colors"
-          >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-        )}
+        {/* Expand button — visible to everyone */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex-shrink-0 p-1.5 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--text-muted)] transition-colors"
+        >
+          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
       </div>
 
-      {/* Activities preview */}
+      {/* Activities preview (collapsed) */}
       {!expanded && localDay.activities && (
         <div className="px-3 sm:px-4 pb-3 pl-12">
           <p className="text-xs text-[var(--text-muted)] truncate">{localDay.activities}</p>
         </div>
       )}
 
-      {/* Expanded edit form */}
+      {/* Read-only expanded view for guests */}
+      {expanded && !isAdmin && (
+        <div className="px-3 sm:px-4 pb-4 pt-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-3">
+          {!localDay.activities ? (
+            <p className="text-sm text-[var(--text-muted)] italic">
+              {lang === 'nl' ? 'Geen activiteiten beschreven.' : 'No activities described.'}
+            </p>
+          ) : (
+            <>
+              <div className="flex gap-4 text-xs text-[var(--text-muted)]">
+                {!(['vrij', 'ziek', 'feestdag'] as DayType[]).includes(localDay.type) && (
+                  <>
+                    <span>{localDay.startTime} – {localDay.endTime}</span>
+                    <span className="font-semibold text-[var(--text-primary)]">{localDay.hours}u</span>
+                  </>
+                )}
+              </div>
+              <p className="text-sm text-[var(--text-primary)] whitespace-pre-wrap leading-relaxed">
+                {localDay.activities}
+              </p>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Expanded edit form — admins only */}
       {expanded && isAdmin && (
         <div className="px-3 sm:px-4 pb-4 pt-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
