@@ -4,7 +4,7 @@ import { Providers } from '@/components/Providers'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
-  title: 'ArcInternship – Stage Uren Registratie',
+  title: 'ArcInternship',
   description: 'Stage uren registratie voor ArcNode & Stinoo Network',
   icons: { icon: '/favicon.svg' },
 }
