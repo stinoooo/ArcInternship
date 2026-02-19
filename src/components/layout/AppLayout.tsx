@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { MobileNav } from './MobileNav'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -34,18 +35,23 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* Desktop sidebar */}
       <Sidebar lang={lang} session={session} />
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header lang={lang} session={session} />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6 pb-24 md:pb-6">
           {children}
         </main>
-        <footer className="px-6 py-3 border-t border-[var(--border)] bg-[var(--bg-card)]">
+        <footer className="hidden md:block px-6 py-3 border-t border-[var(--border)] bg-[var(--bg-card)]">
           <p className="text-xs text-[var(--text-muted)] text-center">
             Part of the ArcNode Network & Stinoo Network
           </p>
         </footer>
       </div>
+
+      {/* Mobile bottom nav */}
+      <MobileNav lang={lang} session={session} />
     </div>
   )
 }
