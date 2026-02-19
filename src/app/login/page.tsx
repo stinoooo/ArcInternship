@@ -1,0 +1,158 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { Eye, EyeOff, LogIn } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+export default function LoginPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (session) router.push('/dashboard')
+  }, [session, router])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (result?.error) {
+      setError('Ongeldige inloggegevens. Probeer opnieuw.')
+      setLoading(false)
+    } else {
+      router.push('/dashboard')
+    }
+  }
+
+  if (status === 'loading') return null
+
+  return (
+    <div className="min-h-screen flex bg-[var(--bg-primary)]">
+      {/* Left panel */}
+      <div className="hidden lg:flex w-1/2 bg-arc-navy flex-col items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-arc-blue/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-arc-blue/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-arc-blue/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative z-10 text-center">
+          <Image src="/whitelogo.svg" alt="ArcInternship" width={80} height={80} className="mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-white mb-3">ArcInternship</h2>
+          <p className="text-slate-400 text-lg mb-8">Stage Uren Registratie</p>
+
+          <div className="space-y-4 text-left">
+            {[
+              { label: 'Voortgang', value: '760 uur doelstelling' },
+              { label: 'Periode', value: '9 feb – 10 jul 2026' },
+              { label: 'Dagregistratie', value: 'Snel en eenvoudig' },
+              { label: 'Export', value: 'Professioneel Excel-bestand' },
+            ].map(item => (
+              <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-3">
+                <div className="w-2 h-2 rounded-full bg-arc-blue" />
+                <span className="text-slate-400 text-sm w-32">{item.label}</span>
+                <span className="text-white text-sm font-medium">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-12 text-center">
+          <p className="text-slate-600 text-xs">Part of the ArcNode Network & Stinoo Network</p>
+        </div>
+      </div>
+
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-[var(--bg-secondary)]">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-8">
+            <Image src="/bluelogo.svg" alt="ArcInternship" width={48} height={48} className="mx-auto mb-3" />
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">ArcInternship</h1>
+          </div>
+
+          <div className="card">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">Inloggen</h2>
+              <p className="text-sm text-[var(--text-muted)] mt-1">Toegang tot je stage-uren dashboard</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="label">E-mailadres</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="input"
+                  placeholder="stijn@stinoo.dev"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label">Wachtwoord</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="input pr-10"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+                  <p className="text-red-500 text-sm">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={cn(
+                  'btn-primary w-full flex items-center justify-center gap-2 py-2.5',
+                  loading && 'opacity-70 cursor-not-allowed'
+                )}
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <LogIn size={16} />
+                )}
+                {loading ? 'Bezig...' : 'Inloggen'}
+              </button>
+            </form>
+          </div>
+
+          <p className="text-center text-xs text-[var(--text-muted)] mt-6">
+            Part of the ArcNode Network & Stinoo Network
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
