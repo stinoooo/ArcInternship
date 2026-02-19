@@ -31,9 +31,14 @@ export async function PATCH(
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const sessionUser = session.user as { role?: string }
+  if (sessionUser.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
   await connectToDatabase()
   const body = await req.json()
-  const user = await User.findByIdAndUpdate(params.id, body, { new: true })
+  // Strip password from body to prevent accidental overwrites
+  const { password: _pw, ...safeBody } = body
+  const user = await User.findByIdAndUpdate(params.id, safeBody, { new: true })
   if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   return NextResponse.json({ ...user.toObject(), password: undefined })

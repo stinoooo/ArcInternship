@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -146,6 +147,13 @@ export default function LoginPage() {
                 {loading ? 'Bezig...' : 'Inloggen'}
               </button>
             </form>
+
+            <p className="text-center text-sm text-[var(--text-muted)] mt-4">
+              Nog geen account?{' '}
+              <Link href="/register" className="text-arc-blue hover:underline font-medium">
+                Toegang aanvragen
+              </Link>
+            </p>
           </div>
 
           <p className="text-center text-xs text-[var(--text-muted)] mt-6">

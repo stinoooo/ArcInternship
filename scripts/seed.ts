@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   username: String,
   password: String,
   role: String,
+  approved: { type: Boolean, default: false },
   language: { type: String, default: 'nl' },
   theme: { type: String, default: 'light' },
 }, { timestamps: true })
@@ -89,6 +90,7 @@ async function seed() {
       username: 'stijn',
       password: hashedPassword,
       role: 'admin',
+      approved: true,
       language: 'nl',
       theme: 'dark',
     },
