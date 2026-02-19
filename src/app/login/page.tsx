@@ -7,6 +7,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { translations } from '@/i18n/translations'
+
+type Lang = 'nl' | 'en'
 
 export default function LoginPage() {
   const { data: session, status } = useSession()
@@ -16,10 +19,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [lang, setLang] = useState<Lang>('nl')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('login_lang') as Lang | null
+    if (saved === 'nl' || saved === 'en') setLang(saved)
+  }, [])
 
   useEffect(() => {
     if (session) router.push('/dashboard')
   }, [session, router])
+
+  const t = translations[lang]
+
+  const toggleLang = () => {
+    const next: Lang = lang === 'nl' ? 'en' : 'nl'
+    setLang(next)
+    localStorage.setItem('login_lang', next)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +50,7 @@ export default function LoginPage() {
     })
 
     if (result?.error) {
-      setError('Ongeldige inloggegevens. Probeer opnieuw.')
+      setError(t.loginError)
       setLoading(false)
     } else {
       router.push('/dashboard')
@@ -41,6 +58,13 @@ export default function LoginPage() {
   }
 
   if (status === 'loading') return null
+
+  const features = [
+    { label: t.featureProgress, value: t.featureTarget },
+    { label: t.featurePeriod, value: t.featurePeriodValue },
+    { label: t.featureDailyLog, value: t.featureQuick },
+    { label: t.featureExportLabel, value: t.featureExcelValue },
+  ]
 
   return (
     <div className="min-h-screen flex bg-[var(--bg-primary)]">
@@ -53,15 +77,10 @@ export default function LoginPage() {
         <div className="relative z-10 text-center">
           <Image src="/whitelogo.svg" alt="ArcInternship" width={80} height={80} className="mx-auto mb-6" />
           <h2 className="text-3xl font-bold text-white mb-3">ArcInternship</h2>
-          <p className="text-slate-400 text-lg mb-8">Stage Uren Registratie</p>
+          <p className="text-slate-400 text-lg mb-8">{t.loginSubtitle}</p>
 
           <div className="space-y-4 text-left">
-            {[
-              { label: 'Voortgang', value: '760 uur doelstelling' },
-              { label: 'Periode', value: '9 feb – 10 jul 2026' },
-              { label: 'Dagregistratie', value: 'Snel en eenvoudig' },
-              { label: 'Export', value: 'Professioneel Excel-bestand' },
-            ].map(item => (
+            {features.map(item => (
               <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-3">
                 <div className="w-2 h-2 rounded-full bg-arc-blue" />
                 <span className="text-slate-400 text-sm w-32">{item.label}</span>
@@ -72,12 +91,20 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 mt-12 text-center">
-          <p className="text-slate-600 text-xs">Part of the ArcNode Network & Stinoo Network</p>
+          <p className="text-slate-600 text-xs">{t.footerText}</p>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[var(--bg-secondary)]">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[var(--bg-secondary)] relative">
+        {/* Language toggle */}
+        <button
+          onClick={toggleLang}
+          className="absolute top-4 right-4 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-arc-blue transition-colors"
+        >
+          {lang === 'nl' ? 'EN' : 'NL'}
+        </button>
+
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
@@ -87,13 +114,13 @@ export default function LoginPage() {
 
           <div className="card">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-[var(--text-primary)]">Inloggen</h2>
-              <p className="text-sm text-[var(--text-muted)] mt-1">Toegang tot je stage-uren dashboard</p>
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">{t.login}</h2>
+              <p className="text-sm text-[var(--text-muted)] mt-1">{t.loginSubtitleCard}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="label">E-mailadres</label>
+                <label className="label">{t.email}</label>
                 <input
                   type="email"
                   value={email}
@@ -105,7 +132,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="label">Wachtwoord</label>
+                <label className="label">{t.password}</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -144,20 +171,20 @@ export default function LoginPage() {
                 ) : (
                   <LogIn size={16} />
                 )}
-                {loading ? 'Bezig...' : 'Inloggen'}
+                {loading ? t.loggingIn : t.loginButton}
               </button>
             </form>
 
             <p className="text-center text-sm text-[var(--text-muted)] mt-4">
-              Nog geen account?{' '}
+              {t.noAccount}{' '}
               <Link href="/register" className="text-arc-blue hover:underline font-medium">
-                Toegang aanvragen
+                {t.requestAccess}
               </Link>
             </p>
           </div>
 
           <p className="text-center text-xs text-[var(--text-muted)] mt-6">
-            Part of the ArcNode Network & Stinoo Network
+            {t.footerText}
           </p>
         </div>
       </div>

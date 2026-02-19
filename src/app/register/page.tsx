@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Eye, EyeOff, UserPlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { translations } from '@/i18n/translations'
+
+type Lang = 'nl' | 'en'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -14,13 +17,27 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [lang, setLang] = useState<Lang>('nl')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('login_lang') as Lang | null
+    if (saved === 'nl' || saved === 'en') setLang(saved)
+  }, [])
+
+  const t = translations[lang]
+
+  const toggleLang = () => {
+    const next: Lang = lang === 'nl' ? 'en' : 'nl'
+    setLang(next)
+    localStorage.setItem('login_lang', next)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     if (form.password !== form.confirmPassword) {
-      setError('Wachtwoorden komen niet overeen.')
+      setError(t.passwordsNoMatch)
       return
     }
 
@@ -35,14 +52,21 @@ export default function RegisterPage() {
       if (res.ok) {
         setDone(true)
       } else {
-        setError(data.error || 'Er is een fout opgetreden.')
+        setError(data.error || t.error)
       }
     } catch {
-      setError('Er is een fout opgetreden.')
+      setError(t.error)
     } finally {
       setLoading(false)
     }
   }
+
+  const features = [
+    { label: t.featureProgress, value: t.featureTarget },
+    { label: t.featurePeriod, value: t.featurePeriodValue },
+    { label: t.featureDailyLog, value: t.featureQuick },
+    { label: t.featureExportLabel, value: t.featureExcelValue },
+  ]
 
   return (
     <div className="min-h-screen flex bg-[var(--bg-primary)]">
@@ -55,15 +79,10 @@ export default function RegisterPage() {
         <div className="relative z-10 text-center">
           <Image src="/whitelogo.svg" alt="ArcInternship" width={80} height={80} className="mx-auto mb-6" />
           <h2 className="text-3xl font-bold text-white mb-3">ArcInternship</h2>
-          <p className="text-slate-400 text-lg mb-8">Stage Uren Registratie</p>
+          <p className="text-slate-400 text-lg mb-8">{t.loginSubtitle}</p>
 
           <div className="space-y-4 text-left">
-            {[
-              { label: 'Voortgang', value: '760 uur doelstelling' },
-              { label: 'Periode', value: '9 feb – 10 jul 2026' },
-              { label: 'Dagregistratie', value: 'Snel en eenvoudig' },
-              { label: 'Export', value: 'Professioneel Excel-bestand' },
-            ].map(item => (
+            {features.map(item => (
               <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-3">
                 <div className="w-2 h-2 rounded-full bg-arc-blue" />
                 <span className="text-slate-400 text-sm w-32">{item.label}</span>
@@ -74,12 +93,20 @@ export default function RegisterPage() {
         </div>
 
         <div className="relative z-10 mt-12 text-center">
-          <p className="text-slate-600 text-xs">Part of the ArcNode Network & Stinoo Network</p>
+          <p className="text-slate-600 text-xs">{t.footerText}</p>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[var(--bg-secondary)]">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[var(--bg-secondary)] relative">
+        {/* Language toggle */}
+        <button
+          onClick={toggleLang}
+          className="absolute top-4 right-4 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-arc-blue transition-colors"
+        >
+          {lang === 'nl' ? 'EN' : 'NL'}
+        </button>
+
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
@@ -93,24 +120,22 @@ export default function RegisterPage() {
                 <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
                   <UserPlus size={24} className="text-green-500" />
                 </div>
-                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">Aanvraag ingediend</h2>
-                <p className="text-sm text-[var(--text-muted)] mb-6">
-                  Je account-aanvraag is ontvangen. Je krijgt toegang zodra een beheerder je account goedkeurt.
-                </p>
+                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">{t.registerSuccessTitle}</h2>
+                <p className="text-sm text-[var(--text-muted)] mb-6">{t.registerSuccessText}</p>
                 <Link href="/login" className="btn-primary inline-flex items-center gap-2">
-                  Terug naar inloggen
+                  {t.backToLogin}
                 </Link>
               </div>
             ) : (
               <>
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-[var(--text-primary)]">Account aanvragen</h2>
-                  <p className="text-sm text-[var(--text-muted)] mt-1">Een beheerder keurt je aanvraag goed</p>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)]">{t.registerTitle}</h2>
+                  <p className="text-sm text-[var(--text-muted)] mt-1">{t.registerSubtitle}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="label">E-mailadres</label>
+                    <label className="label">{t.email}</label>
                     <input
                       type="email"
                       value={form.email}
@@ -122,26 +147,26 @@ export default function RegisterPage() {
                   </div>
 
                   <div>
-                    <label className="label">Gebruikersnaam</label>
+                    <label className="label">{t.usernameLabel}</label>
                     <input
                       type="text"
                       value={form.username}
                       onChange={e => setForm(prev => ({ ...prev, username: e.target.value }))}
                       className="input"
-                      placeholder="gebruikersnaam"
+                      placeholder={t.usernamePlaceholder}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="label">Wachtwoord</label>
+                    <label className="label">{t.password}</label>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
                         value={form.password}
                         onChange={e => setForm(prev => ({ ...prev, password: e.target.value }))}
                         className="input pr-10"
-                        placeholder="Minimaal 8 tekens"
+                        placeholder={t.passwordMinHint}
                         required
                         minLength={8}
                       />
@@ -156,13 +181,13 @@ export default function RegisterPage() {
                   </div>
 
                   <div>
-                    <label className="label">Wachtwoord bevestigen</label>
+                    <label className="label">{t.confirmPasswordLabel}</label>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={form.confirmPassword}
                       onChange={e => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       className="input"
-                      placeholder="Herhaal wachtwoord"
+                      placeholder={t.confirmPasswordPlaceholder}
                       required
                     />
                   </div>
@@ -186,14 +211,14 @@ export default function RegisterPage() {
                     ) : (
                       <UserPlus size={16} />
                     )}
-                    {loading ? 'Bezig...' : 'Aanvragen'}
+                    {loading ? t.loggingIn : t.registerButton}
                   </button>
                 </form>
 
                 <p className="text-center text-sm text-[var(--text-muted)] mt-4">
-                  Al een account?{' '}
+                  {t.alreadyAccount}{' '}
                   <Link href="/login" className="text-arc-blue hover:underline font-medium">
-                    Inloggen
+                    {t.login}
                   </Link>
                 </p>
               </>
@@ -201,7 +226,7 @@ export default function RegisterPage() {
           </div>
 
           <p className="text-center text-xs text-[var(--text-muted)] mt-6">
-            Part of the ArcNode Network & Stinoo Network
+            {t.footerText}
           </p>
         </div>
       </div>
