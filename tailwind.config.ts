@@ -11,13 +11,18 @@ const config: Config = {
     extend: {
       colors: {
         arc: {
-          blue: '#2563EB',
-          'blue-dark': '#1D4ED8',
-          'blue-light': '#3B82F6',
-          navy: '#0F172A',
-          'navy-light': '#1E293B',
-          slate: '#334155',
-          muted: '#64748B',
+          // Accent (cyan)
+          blue: '#6AE4FF',
+          'blue-dark': '#3ECBEB',
+          'blue-light': '#9AEEFF',
+          // Backgrounds
+          navy: '#0B1020',
+          'navy-light': '#111A33',
+          slate: '#1E2A4A',
+          muted: '#9AA6C2',
+          // Status
+          success: '#3DFFB5',
+          error: '#FF5C7A',
         }
       },
       fontFamily: {
