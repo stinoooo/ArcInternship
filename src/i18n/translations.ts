@@ -80,8 +80,7 @@ export const translations = {
 
     // Settings
     settingsTitle: 'Instellingen',
-    users: 'Gebruikers',
-    addUser: 'Gebruiker toevoegen',
+    users: 'Actieve gebruikers',
     username: 'Gebruikersnaam',
     role: 'Rol',
     admin: 'Beheerder',
@@ -90,8 +89,6 @@ export const translations = {
     theme: 'Thema',
     lightMode: 'Lichte modus',
     darkMode: 'Donkere modus',
-    createUser: 'Gebruiker aanmaken',
-    userCreated: 'Gebruiker aangemaakt en e-mail verstuurd',
     deleteUser: 'Gebruiker verwijderen',
     confirmDelete: 'Weet je zeker dat je deze gebruiker wilt verwijderen?',
 
@@ -179,8 +176,7 @@ export const translations = {
 
     // Settings
     settingsTitle: 'Settings',
-    users: 'Users',
-    addUser: 'Add User',
+    users: 'Active Users',
     username: 'Username',
     role: 'Role',
     admin: 'Admin',
@@ -189,8 +185,6 @@ export const translations = {
     theme: 'Theme',
     lightMode: 'Light mode',
     darkMode: 'Dark mode',
-    createUser: 'Create user',
-    userCreated: 'User created and email sent',
     deleteUser: 'Delete user',
     confirmDelete: 'Are you sure you want to delete this user?',
 

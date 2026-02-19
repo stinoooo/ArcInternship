@@ -8,6 +8,7 @@ export interface IUser {
   username: string
   password: string
   role: UserRole
+  approved: boolean
   language: Language
   theme: 'light' | 'dark'
   createdAt: Date
