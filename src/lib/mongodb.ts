@@ -1,11 +1,5 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.DATABASE_URL!
-
-if (!MONGODB_URI) {
-  throw new Error('DATABASE_URL environment variable is not set')
-}
-
 interface GlobalMongoose {
   conn: typeof mongoose | null
   promise: Promise<typeof mongoose> | null
@@ -23,6 +17,12 @@ if (!global.mongoose) {
 }
 
 export async function connectToDatabase() {
+  const MONGODB_URI = process.env.DATABASE_URL
+
+  if (!MONGODB_URI) {
+    throw new Error('DATABASE_URL environment variable is not set')
+  }
+
   if (cached.conn) return cached.conn
 
   if (!cached.promise) {

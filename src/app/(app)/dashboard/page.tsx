@@ -31,8 +31,12 @@ export default async function DashboardPage() {
 
   const days = await getDashboardData()
 
+  const noHoursTypes = ['vrij', 'ziek', 'feestdag']
   const completedDays = days.filter(d => d.isComplete)
-  const completedHours = completedDays.reduce((sum, d) => sum + d.hours, 0)
+  const completedHours = completedDays.reduce(
+    (sum, d) => sum + (noHoursTypes.includes(d.type) ? 0 : d.hours),
+    0
+  )
   const remainingHours = Math.max(0, TARGET_HOURS - completedHours)
   const percentage = Math.min(100, Math.round((completedHours / TARGET_HOURS) * 100))
   const totalWorkdays = days.length
@@ -50,7 +54,10 @@ export default async function DashboardPage() {
     weekNumber,
     year: weekDays[0].year,
     days: weekDays,
-    totalHours: weekDays.filter(d => d.isComplete).reduce((sum, d) => sum + d.hours, 0),
+    totalHours: weekDays.filter(d => d.isComplete).reduce(
+      (sum, d) => sum + (noHoursTypes.includes(d.type) ? 0 : d.hours),
+      0
+    ),
     completedDays: weekDays.filter(d => d.isComplete).length,
   }))
 
