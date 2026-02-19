@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { IDay, DayType } from '@/types'
 import { translations } from '@/i18n/translations'
 import { getDayName, formatDate, calculateHours, cn } from '@/lib/utils'
@@ -41,6 +42,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
   isAdmin: boolean
   onUpdate: (id: string, data: Partial<IDay>) => void
 }) {
+  const router = useRouter()
   const [expanded, setExpanded] = useState(false)
   const [saving, setSaving] = useState(false)
   const [localDay, setLocalDay] = useState(day)
@@ -97,6 +99,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
         // Update local baseline so button greys out again
         setLocalDay(updated)
         toast.success(t.success)
+        router.refresh()
       } else {
         toast.error(t.error)
       }
@@ -118,6 +121,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
       })
       if (res.ok) {
         onUpdate(localDay._id, { isComplete: newComplete })
+        router.refresh()
       }
     } catch (_err) {
       setLocalDay(prev => ({ ...prev, isComplete: !newComplete }))
