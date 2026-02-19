@@ -24,7 +24,7 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
     return (
       <div className="flex items-center justify-center h-screen bg-[var(--bg-primary)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-arc-blue border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-arc-blue/30 border-t-arc-blue rounded-full animate-spin" />
           <span className="text-[var(--text-muted)] text-sm">Laden...</span>
         </div>
       </div>

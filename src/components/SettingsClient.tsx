@@ -137,22 +137,22 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId }: Pro
                   <button
                     onClick={() => handleApprove(user._id)}
                     disabled={approving === user._id || deleting === user._id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors text-sm font-medium disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-arc-success/10 text-arc-success hover:bg-arc-success/20 transition-colors text-sm font-medium disabled:opacity-50"
                     title={lang === 'nl' ? 'Goedkeuren' : 'Approve'}
                   >
                     {approving === user._id
-                      ? <div className="w-3.5 h-3.5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                      ? <div className="w-3.5 h-3.5 border-2 border-arc-success border-t-transparent rounded-full animate-spin" />
                       : <Check size={14} />}
                     {lang === 'nl' ? 'Goedkeuren' : 'Approve'}
                   </button>
                   <button
                     onClick={() => handleDeny(user._id)}
                     disabled={approving === user._id || deleting === user._id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors text-sm font-medium disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-arc-error/10 text-arc-error hover:bg-arc-error/20 transition-colors text-sm font-medium disabled:opacity-50"
                     title={lang === 'nl' ? 'Weigeren' : 'Deny'}
                   >
                     {deleting === user._id
-                      ? <div className="w-3.5 h-3.5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      ? <div className="w-3.5 h-3.5 border-2 border-arc-error border-t-transparent rounded-full animate-spin" />
                       : <X size={14} />}
                     {lang === 'nl' ? 'Weigeren' : 'Deny'}
                   </button>
@@ -188,7 +188,7 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId }: Pro
             >
               <div className={cn(
                 'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold',
-                user.role === 'admin' ? 'bg-arc-blue text-white' : 'bg-[var(--border)] text-[var(--text-muted)]'
+                user.role === 'admin' ? 'bg-arc-blue/20 border border-arc-blue/30 text-arc-blue' : 'bg-[var(--border)] text-[var(--text-muted)]'
               )}>
                 {user.username[0]?.toUpperCase()}
               </div>
@@ -221,11 +221,11 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId }: Pro
                   <button
                     onClick={() => handleDelete(user._id)}
                     disabled={deleting === user._id}
-                    className="p-1.5 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="p-1.5 text-[var(--text-muted)] hover:text-arc-error hover:bg-arc-error/10 rounded-lg transition-colors"
                     title={t.deleteUser}
                   >
                     {deleting === user._id
-                      ? <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      ? <div className="w-4 h-4 border-2 border-arc-error border-t-transparent rounded-full animate-spin" />
                       : <Trash2 size={16} />
                     }
                   </button>

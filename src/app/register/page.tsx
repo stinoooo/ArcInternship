@@ -182,7 +182,7 @@ export default function RegisterPage() {
                     )}
                   >
                     {loading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-arc-navy border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <UserPlus size={16} />
                     )}

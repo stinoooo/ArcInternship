@@ -63,7 +63,7 @@ export function ExportClient({ lang }: Props) {
                 className="btn-primary mt-4 flex items-center gap-2"
               >
                 {loading === 'all' ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-arc-navy border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Download size={16} />
                 )}
