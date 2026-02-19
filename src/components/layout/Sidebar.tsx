@@ -27,7 +27,7 @@ export function Sidebar({ lang, session }: SidebarProps) {
   ]
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-[var(--bg-card)] border-r border-[var(--border)] flex flex-col">
+    <aside className="hidden md:flex w-64 flex-shrink-0 bg-[var(--bg-card)] border-r border-[var(--border)] flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-[var(--border)]">
         <div className="flex items-center gap-3">

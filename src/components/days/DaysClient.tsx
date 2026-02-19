@@ -21,6 +21,20 @@ const DAY_TYPE_COLORS: Record<DayType, string> = {
   feestdag: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
 }
 
+// Internship starts ISO week 7 of 2026
+const INTERNSHIP_START_ISO_WEEK = 7
+
+function getInternshipWeek(isoWeek: number): number {
+  return isoWeek - INTERNSHIP_START_ISO_WEEK + 1
+}
+
+function stageWeekLabel(isoWeek: number, lang: string): string {
+  const n = getInternshipWeek(isoWeek)
+  if (lang === 'en') return `Internship week ${n}`
+  const suffix = n === 1 ? 'ste' : 'de'
+  return `${n}${suffix} stageweek`
+}
+
 function DayRow({ day, lang, isAdmin, onUpdate }: {
   day: IDay
   lang: string
@@ -31,6 +45,13 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
   const [saving, setSaving] = useState(false)
   const [localDay, setLocalDay] = useState(day)
   const t = translations[lang as 'nl' | 'en'] || translations.nl
+
+  const hasChanges =
+    localDay.type !== day.type ||
+    localDay.startTime !== day.startTime ||
+    localDay.endTime !== day.endTime ||
+    localDay.activities !== day.activities ||
+    localDay.isComplete !== day.isComplete
 
   const noHoursTypes: DayType[] = ['vrij', 'ziek', 'feestdag']
   const isNoHours = noHoursTypes.includes(localDay.type)
@@ -73,6 +94,8 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
       if (res.ok) {
         const updated = await res.json()
         onUpdate(localDay._id, updated)
+        // Update local baseline so button greys out again
+        setLocalDay(updated)
         toast.success(t.success)
       } else {
         toast.error(t.error)
@@ -88,12 +111,14 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
     const newComplete = !localDay.isComplete
     setLocalDay(prev => ({ ...prev, isComplete: newComplete }))
     try {
-      await fetch(`/api/days/${localDay._id}`, {
+      const res = await fetch(`/api/days/${localDay._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isComplete: newComplete }),
       })
-      onUpdate(localDay._id, { isComplete: newComplete })
+      if (res.ok) {
+        onUpdate(localDay._id, { isComplete: newComplete })
+      }
     } catch (_err) {
       setLocalDay(prev => ({ ...prev, isComplete: !newComplete }))
     }
@@ -105,7 +130,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
       localDay.isComplete && 'border-green-500/30 bg-green-500/5'
     )}>
       {/* Row header */}
-      <div className="flex items-center gap-3 p-4">
+      <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4">
         {/* Complete toggle */}
         {isAdmin ? (
           <button onClick={handleToggleComplete} className="flex-shrink-0">
@@ -124,7 +149,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
         )}
 
         {/* Date info */}
-        <div className="flex-shrink-0 text-center min-w-[50px]">
+        <div className="flex-shrink-0 text-center min-w-[42px]">
           <p className="text-xs text-[var(--text-muted)] font-medium">
             {getDayName(localDay.dayOfWeek, lang, true)}
           </p>
@@ -133,21 +158,23 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
           </p>
         </div>
 
-        {/* Full date & week */}
+        {/* Full date */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-[var(--text-primary)]">
+          <p className="text-sm font-medium text-[var(--text-primary)] hidden sm:block">
             {formatDate(localDay.date, lang)}
           </p>
-          <p className="text-xs text-[var(--text-muted)]">Week {localDay.weekNumber}</p>
+          <p className="text-xs font-medium text-[var(--text-primary)] sm:hidden">
+            {new Date(localDay.date + 'T00:00:00').toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-US', { day: '2-digit', month: '2-digit' })}
+          </p>
         </div>
 
         {/* Type badge */}
-        <span className={cn('badge border', DAY_TYPE_COLORS[localDay.type])}>
+        <span className={cn('badge border text-xs hidden xs:inline-flex', DAY_TYPE_COLORS[localDay.type])}>
           {t[localDay.type as keyof typeof t] as string}
         </span>
 
         {/* Hours */}
-        <div className="text-right min-w-[48px]">
+        <div className="text-right min-w-[40px]">
           <p className="text-sm font-bold text-[var(--text-primary)]">
             {isNoHours ? '–' : `${localDay.hours}u`}
           </p>
@@ -166,22 +193,22 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
 
       {/* Activities preview */}
       {!expanded && localDay.activities && (
-        <div className="px-4 pb-3 pl-14">
+        <div className="px-3 sm:px-4 pb-3 pl-12">
           <p className="text-xs text-[var(--text-muted)] truncate">{localDay.activities}</p>
         </div>
       )}
 
       {/* Expanded edit form */}
       {expanded && isAdmin && (
-        <div className="px-4 pb-4 pt-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="px-3 sm:px-4 pb-4 pt-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {/* Type */}
             <div>
               <label className="label">{t.type}</label>
               <select
                 value={localDay.type}
                 onChange={e => handleChange('type', e.target.value as DayType)}
-                className="input"
+                className="input text-sm"
               >
                 {(['werkdag', 'thuiswerk', 'vrij', 'ziek', 'feestdag'] as DayType[]).map(type => (
                   <option key={type} value={type}>{t[type as keyof typeof t] as string}</option>
@@ -197,7 +224,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
                 value={localDay.startTime}
                 onChange={e => handleChange('startTime', e.target.value)}
                 disabled={isNoHours}
-                className="input disabled:opacity-50"
+                className="input text-sm disabled:opacity-50"
               />
             </div>
 
@@ -209,7 +236,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
                 value={localDay.endTime}
                 onChange={e => handleChange('endTime', e.target.value)}
                 disabled={isNoHours}
-                className="input disabled:opacity-50"
+                className="input text-sm disabled:opacity-50"
               />
             </div>
 
@@ -220,7 +247,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
                 type="number"
                 value={localDay.hours}
                 readOnly
-                className="input opacity-70 cursor-not-allowed"
+                className="input text-sm opacity-70 cursor-not-allowed"
               />
             </div>
           </div>
@@ -231,7 +258,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
             <textarea
               value={localDay.activities}
               onChange={e => handleChange('activities', e.target.value)}
-              className="input min-h-[100px] resize-y"
+              className="input min-h-[80px] resize-y text-sm"
               placeholder="Beschrijf de activiteiten van vandaag..."
             />
           </div>
@@ -249,8 +276,11 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
             </label>
             <button
               onClick={handleSave}
-              disabled={saving}
-              className="btn-primary flex items-center gap-2"
+              disabled={saving || !hasChanges}
+              className={cn(
+                'btn-primary flex items-center gap-2 transition-opacity',
+                (!hasChanges || saving) && 'opacity-40 cursor-not-allowed'
+              )}
             >
               {saving ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -272,7 +302,6 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [completedFilter, setCompletedFilter] = useState(false)
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set(
-    // Expand current week and recent weeks
     Array.from(new Set(initialDays.map(d => d.weekNumber))).slice(-3)
   ))
 
@@ -315,41 +344,41 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t.daysTitle}</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{t.daysTitle}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">
             {days.filter(d => d.isComplete).length} / {days.length} {lang === 'nl' ? 'dagen afgerond' : 'days completed'}
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="card flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="card flex flex-col gap-2 sm:gap-3">
+        <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t.searchDate}
-            className="input pl-9"
+            className="input pl-9 text-sm"
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter size={16} className="text-[var(--text-muted)]" />
+          <Filter size={15} className="text-[var(--text-muted)] flex-shrink-0" />
           <select
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
-            className="input w-40"
+            className="input flex-1 text-sm"
           >
             <option value="all">{t.allTypes}</option>
             {(['werkdag', 'thuiswerk', 'vrij', 'ziek', 'feestdag'] as DayType[]).map(type => (
               <option key={type} value={type}>{t[type as keyof typeof t] as string}</option>
             ))}
           </select>
-          <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
+          <label className="flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
             <input
               type="checkbox"
               checked={completedFilter}
@@ -363,34 +392,37 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
 
       {/* Week groups */}
       {weekGroups.length === 0 ? (
-        <div className="card text-center py-12">
+        <div className="card text-center py-10">
           <p className="text-[var(--text-muted)]">{t.noResults}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {weekGroups.map(({ week, days: weekDays, totalHours }) => (
             <div key={week} className="card p-0 overflow-hidden">
               <button
                 onClick={() => toggleWeek(week)}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-[var(--bg-secondary)] transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-[var(--bg-secondary)] transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  {expandedWeeks.has(week) ? <ChevronUp size={18} className="text-[var(--text-muted)]" /> : <ChevronDown size={18} className="text-[var(--text-muted)]" />}
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {t.week} {week}
-                  </span>
-                  <span className="text-xs text-[var(--text-muted)]">
-                    {weekDays.filter(d => d.isComplete).length}/{weekDays.length} {lang === 'nl' ? 'compleet' : 'complete'}
-                  </span>
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  {expandedWeeks.has(week)
+                    ? <ChevronUp size={16} className="text-[var(--text-muted)] flex-shrink-0" />
+                    : <ChevronDown size={16} className="text-[var(--text-muted)] flex-shrink-0" />}
+                  <div className="text-left min-w-0">
+                    <span className="font-semibold text-[var(--text-primary)] text-sm block">
+                      {stageWeekLabel(week, lang)}
+                    </span>
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {lang === 'nl' ? 'Week' : 'ISO week'} {week} · {weekDays.filter(d => d.isComplete).length}/{weekDays.length} {lang === 'nl' ? 'compleet' : 'complete'}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex-shrink-0 ml-2">
                   <span className="text-sm font-bold text-arc-blue">{totalHours}u</span>
-                  <span className="text-xs text-[var(--text-muted)] ml-1">{t.weekTotal}</span>
                 </div>
               </button>
 
               {expandedWeeks.has(week) && (
-                <div className="px-4 pb-4 space-y-2">
+                <div className="px-2 sm:px-4 pb-3 pt-1 space-y-2">
                   {weekDays.map(day => (
                     <DayRow
                       key={day._id}
