@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -32,8 +32,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [users, setUsers] = useState<IUser[]>(initialUsers)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [approving, setApproving] = useState<string | null>(null)
-  const [migrating, setMigrating] = useState(false)
-  const [migrateTargetId, setMigrateTargetId] = useState('')
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -116,36 +114,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
       }
     } catch {
       toast.error(t.error)
-    }
-  }
-
-  const handleMigrate = async () => {
-    if (!migrateTargetId) {
-      toast.error(lang === 'nl' ? 'Selecteer een student' : 'Select a student')
-      return
-    }
-    if (!confirm(lang === 'nl'
-      ? 'Alle daglogboeken zonder eigenaar toewijzen aan deze student?'
-      : 'Assign all unowned day logs to this student?')) return
-    setMigrating(true)
-    try {
-      const res = await fetch('/api/days/migrate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUserId: migrateTargetId }),
-      })
-      if (res.ok) {
-        const { migrated } = await res.json()
-        toast.success(lang === 'nl'
-          ? `${migrated} dag(en) gemigreerd`
-          : `${migrated} day(s) migrated`)
-      } else {
-        toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
-      }
-    } catch {
-      toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
-    } finally {
-      setMigrating(false)
     }
   }
 
@@ -298,52 +266,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
           ))}
         </div>
       </div>
-
-      {/* Data migration — admins only */}
-      {isAdmin && (() => {
-        const students = active.filter(u => u.role === 'student' || u.role === 'guest')
-        if (students.length === 0) return null
-        return (
-          <div className="card border border-amber-500/20">
-            <div className="flex items-center gap-2 mb-3">
-              <ArrowRightLeft size={16} className="text-amber-500" />
-              <h2 className="font-semibold text-[var(--text-primary)]">
-                {lang === 'nl' ? 'Daglogboek migratie' : 'Day Log Migration'}
-              </h2>
-            </div>
-            <p className="text-sm text-[var(--text-muted)] mb-4">
-              {lang === 'nl'
-                ? 'Wijs alle bestaande daglogboeken (zonder eigenaar) toe aan een student. Doe dit eenmalig na de update.'
-                : 'Assign all existing day logs (without an owner) to a student. Do this once after updating.'}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <select
-                value={migrateTargetId}
-                onChange={e => setMigrateTargetId(e.target.value)}
-                className="input text-sm flex-1"
-              >
-                <option value="">{lang === 'nl' ? '— Kies student —' : '— Select student —'}</option>
-                {students.map(s => (
-                  <option key={s._id} value={s._id}>{s.username} ({s.email})</option>
-                ))}
-              </select>
-              <button
-                onClick={handleMigrate}
-                disabled={migrating || !migrateTargetId}
-                className={cn(
-                  'btn-primary flex items-center gap-2 whitespace-nowrap',
-                  (!migrateTargetId || migrating) && 'opacity-40 cursor-not-allowed'
-                )}
-              >
-                {migrating
-                  ? <div className="w-4 h-4 border-2 border-arc-navy border-t-transparent rounded-full animate-spin" />
-                  : <ArrowRightLeft size={14} />}
-                {lang === 'nl' ? 'Migreer' : 'Migrate'}
-              </button>
-            </div>
-          </div>
-        )
-      })()}
 
       {/* App info — admins only */}
       {isAdmin && (

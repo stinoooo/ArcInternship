@@ -4,6 +4,7 @@ import { authOptions, canApproveUsers, canDeleteUsers, canManageRoles, canViewAl
 import { connectToDatabase } from '@/lib/mongodb'
 import User from '@/lib/models/User'
 import bcrypt from 'bcryptjs'
+import { seedDaysForUser } from '@/lib/seedDays'
 
 // Fields a user can update on their own account (non-privileged)
 const SELF_ALLOWED_FIELDS = [
@@ -112,6 +113,17 @@ export async function PATCH(
 
     const user = await User.findByIdAndUpdate(params.id, filtered, { new: true })
     if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    // Auto-seed weekday Day records when onboarding completes or internship dates change
+    const triggersSeed = 'onboardingCompleted' in filtered || 'startDate' in filtered || 'endDate' in filtered
+    if (triggersSeed && user.onboardingCompleted && user.startDate && user.endDate) {
+      try {
+        await seedDaysForUser(params.id, user.startDate, user.endDate)
+      } catch (e) {
+        console.error('[ArcStage] seedDaysForUser failed (non-fatal):', e)
+      }
+    }
+
     return NextResponse.json({ ...user.toObject(), password: undefined })
   }
 
