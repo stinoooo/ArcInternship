@@ -25,7 +25,7 @@ export default async function DashboardPage({
   // Resolve language from DB
   let lang = 'nl'
   try {
-    const dbUser = await User.findById(sessionUserId)
+    const dbUser = sessionUserId ? await User.findById(sessionUserId) : null
     if (dbUser?.language) {
       lang = dbUser.language
     } else {

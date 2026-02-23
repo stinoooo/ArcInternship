@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -32,6 +32,8 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [users, setUsers] = useState<IUser[]>(initialUsers)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [approving, setApproving] = useState<string | null>(null)
+  const [migrating, setMigrating] = useState(false)
+  const [migrateTargetId, setMigrateTargetId] = useState(currentUserId)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -114,6 +116,33 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
       }
     } catch {
       toast.error(t.error)
+    }
+  }
+
+  const handleMigrate = async () => {
+    if (!migrateTargetId) return
+    if (!confirm(lang === 'nl'
+      ? 'Alle daglogboeken zonder eigenaar toewijzen aan deze gebruiker?'
+      : 'Assign all unowned day logs to this user?')) return
+    setMigrating(true)
+    try {
+      const res = await fetch('/api/days/migrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId: migrateTargetId }),
+      })
+      if (res.ok) {
+        const { migrated, targetUsername } = await res.json()
+        toast.success(lang === 'nl'
+          ? `${migrated} dag(en) toegewezen aan ${targetUsername}`
+          : `${migrated} day(s) assigned to ${targetUsername}`)
+      } else {
+        toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
+      }
+    } catch {
+      toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
+    } finally {
+      setMigrating(false)
     }
   }
 
@@ -266,6 +295,49 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
           ))}
         </div>
       </div>
+
+      {/* Legacy data migration — admins only */}
+      {isAdmin && (
+        <div className="card border border-amber-500/20">
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowRightLeft size={16} className="text-amber-500" />
+            <h2 className="font-semibold text-[var(--text-primary)]">
+              {lang === 'nl' ? 'Daglogboek migratie' : 'Day Log Migration'}
+            </h2>
+          </div>
+          <p className="text-sm text-[var(--text-muted)] mb-4">
+            {lang === 'nl'
+              ? 'Wijs alle daglogboeken zonder eigenaar toe aan een gebruiker. Eenmalig uit te voeren.'
+              : 'Assign all unowned day logs to a user. Run this once.'}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <select
+              value={migrateTargetId}
+              onChange={e => setMigrateTargetId(e.target.value)}
+              className="input text-sm flex-1"
+            >
+              {active.map(u => (
+                <option key={u._id} value={u._id}>
+                  {u.username} ({u.email}){u._id === currentUserId ? (lang === 'nl' ? ' — mijn account' : ' — my account') : ''}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleMigrate}
+              disabled={migrating || !migrateTargetId}
+              className={cn(
+                'btn-primary flex items-center gap-2 whitespace-nowrap',
+                (!migrateTargetId || migrating) && 'opacity-40 cursor-not-allowed'
+              )}
+            >
+              {migrating
+                ? <div className="w-4 h-4 border-2 border-arc-navy border-t-transparent rounded-full animate-spin" />
+                : <ArrowRightLeft size={14} />}
+              {lang === 'nl' ? 'Migreer' : 'Migrate'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* App info — admins only */}
       {isAdmin && (
