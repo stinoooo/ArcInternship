@@ -19,11 +19,11 @@ const BLOCK_DURATION_MS = 15 * 60 * 1000 // 15 minutes
 // Cleanup old entries periodically
 setInterval(() => {
   const now = Date.now()
-  for (const [key, entry] of store.entries()) {
+  store.forEach((entry, key) => {
     if (now - entry.firstAttempt > WINDOW_MS * 2) {
       store.delete(key)
     }
-  }
+  })
 }, 60 * 1000) // Every minute
 
 export function checkRateLimit(identifier: string): { allowed: boolean; retryAfter?: number } {
