@@ -53,7 +53,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         const u = user as unknown as {
           role: string
@@ -65,6 +65,18 @@ export const authOptions: NextAuthOptions = {
         token.language = u.language
         token.theme = u.theme
         token.onboardingCompleted = u.onboardingCompleted
+      }
+      // Handle client-side session.update() calls
+      if (trigger === 'update' && session) {
+        if (typeof session.onboardingCompleted === 'boolean') {
+          token.onboardingCompleted = session.onboardingCompleted
+        }
+        if (session.language === 'nl' || session.language === 'en') {
+          token.language = session.language
+        }
+        if (session.theme === 'light' || session.theme === 'dark') {
+          token.theme = session.theme
+        }
       }
       return token
     },
