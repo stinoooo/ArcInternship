@@ -5,7 +5,8 @@ export interface DayDocument extends Omit<IDay, '_id'>, Document {}
 
 const DaySchema = new Schema<DayDocument>(
   {
-    date: { type: String, required: true, unique: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+    date: { type: String, required: true },
     dayOfWeek: { type: Number, required: true },
     weekNumber: { type: Number, required: true },
     year: { type: Number, required: true },
@@ -22,6 +23,9 @@ const DaySchema = new Schema<DayDocument>(
   },
   { timestamps: true }
 )
+
+// Unique per student per date (sparse so legacy unowned docs can coexist)
+DaySchema.index({ date: 1, userId: 1 }, { unique: true, sparse: true })
 
 const Day: Model<DayDocument> =
   mongoose.models.Day || mongoose.model<DayDocument>('Day', DaySchema)

@@ -27,6 +27,7 @@ export interface IUser {
 
 export interface IDay {
   _id: string
+  userId?: string
   date: string // ISO date string YYYY-MM-DD
   dayOfWeek: number // 0=Sun, 1=Mon... 6=Sat
   weekNumber: number
