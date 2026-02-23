@@ -7,7 +7,6 @@ import { IUser } from '@/types'
 import { translations } from '@/i18n/translations'
 import { User, Lock, Camera, Building2, GraduationCap, Mail, Clock, Calendar, Save } from 'lucide-react'
 import toast from 'react-hot-toast'
-import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -155,11 +154,10 @@ export function ProfileClient({ user, lang }: Props) {
           <div className="relative group">
             <div className="w-16 h-16 rounded-full bg-arc-blue/20 border-2 border-arc-blue/30 overflow-hidden flex items-center justify-center">
               {avatarUrl ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={avatarUrl}
                   alt={user?.username || ''}
-                  width={64}
-                  height={64}
                   className="w-full h-full object-cover"
                 />
               ) : (
