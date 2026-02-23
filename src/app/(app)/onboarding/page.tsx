@@ -40,9 +40,9 @@ export default function OnboardingPage() {
     supervisorContact: '',
   })
 
-  // Admins skip onboarding automatically
+  // Admins and teachers skip onboarding
   useEffect(() => {
-    if (session && user?.role === 'admin') {
+    if (session && (user?.role === 'admin' || user?.role === 'teacher')) {
       router.replace('/dashboard')
     }
     if (session && user?.onboardingCompleted) {

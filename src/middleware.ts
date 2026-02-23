@@ -37,8 +37,8 @@ export async function middleware(req: NextRequest) {
     const role = token.role as string
     const onboardingCompleted = token.onboardingCompleted
 
-    // Admins skip onboarding
-    if (role === 'admin') return NextResponse.next()
+    // Admins and teachers skip onboarding
+    if (role === 'admin' || role === 'teacher') return NextResponse.next()
 
     // If onboardingCompleted is explicitly false (not undefined), redirect to onboarding
     if (onboardingCompleted === false) {
