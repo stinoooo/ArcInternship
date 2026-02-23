@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/mongodb'
 import Day from '@/lib/models/Day'
+import User from '@/lib/models/User'
 import ExcelJS from 'exceljs'
 import { getDayName, formatDate } from '@/lib/utils'
 
@@ -10,16 +11,25 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const sessionUser = session.user as { id?: string; role?: string }
+
   await connectToDatabase()
 
   const url = new URL(req.url)
   const lang = url.searchParams.get('lang') || 'nl'
   const completedOnly = url.searchParams.get('completed') === 'true'
 
-  const query: Record<string, unknown> = {}
+  // Admins can export any student via ?userId=..., otherwise scope to own account
+  const isAdmin = sessionUser.role === 'admin'
+  const targetUserId = (isAdmin && url.searchParams.get('userId')) || sessionUser.id
+
+  const query: Record<string, unknown> = { userId: targetUserId }
   if (completedOnly) query.isComplete = true
 
-  const days = await Day.find(query).sort({ date: 1 })
+  const [days, currentUser] = await Promise.all([
+    Day.find(query).sort({ date: 1 }),
+    User.findById(targetUserId, 'requiredHours username'),
+  ])
 
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'ArcInternship'
@@ -40,7 +50,7 @@ export async function GET(req: NextRequest) {
 
   // Summary block
   const totalCompleted = days.filter(d => d.isComplete).reduce((sum, d) => sum + d.hours, 0)
-  const target = 760
+  const target = currentUser?.requiredHours || 760
   const remaining = Math.max(0, target - totalCompleted)
   const pct = Math.min(100, Math.round((totalCompleted / target) * 100))
 
