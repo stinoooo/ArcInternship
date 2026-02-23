@@ -38,13 +38,13 @@ export const translations = {
     requestAccess: 'Toegang aanvragen',
 
     // Left panel features
-    featureProgress: 'Voortgang',
-    featurePeriod: 'Periode',
+    featureProgress: 'Gemaakt door',
+    featurePeriod: 'Doel',
     featureDailyLog: 'Dagregistratie',
     featureExportLabel: 'Export',
-    featureTarget: '760 uur doelstelling',
-    featurePeriodValue: '9 feb – 10 jul 2026',
-    featureQuick: 'Snel en eenvoudig',
+    featureTarget: 'Stijn',
+    featurePeriodValue: 'Stage-uren registreren',
+    featureQuick: 'Snel en overzichtelijk',
     featureExcelValue: 'Professioneel Excel-bestand',
 
     // Register
@@ -202,13 +202,13 @@ export const translations = {
     requestAccess: 'Request access',
 
     // Left panel features
-    featureProgress: 'Progress',
-    featurePeriod: 'Period',
+    featureProgress: 'Made by',
+    featurePeriod: 'Purpose',
     featureDailyLog: 'Daily Log',
     featureExportLabel: 'Export',
-    featureTarget: '760 hour target',
-    featurePeriodValue: '9 Feb – 10 Jul 2026',
-    featureQuick: 'Quick and simple',
+    featureTarget: 'Stijn',
+    featurePeriodValue: 'Track internship hours',
+    featureQuick: 'Fast and clear',
     featureExcelValue: 'Professional Excel file',
 
     // Register
