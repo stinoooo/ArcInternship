@@ -133,10 +133,13 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
         body: JSON.stringify({ targetUserId: migrateTargetId }),
       })
       if (res.ok) {
-        const { migrated, targetUsername } = await res.json()
+        const { migrated, merged, total, targetUsername } = await res.json()
+        const detail = merged > 0
+          ? (lang === 'nl' ? ` (${merged} samengevoegd)` : ` (${merged} merged)`)
+          : ''
         toast.success(lang === 'nl'
-          ? `${migrated} dag(en) toegewezen aan ${targetUsername}`
-          : `${migrated} day(s) assigned to ${targetUsername}`)
+          ? `${total} dag(en) overgebracht naar ${targetUsername}${detail}`
+          : `${total} day(s) moved to ${targetUsername}${detail}`)
       } else {
         toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
       }
