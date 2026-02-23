@@ -115,6 +115,11 @@ export function canEditDays(role: string): boolean {
   return role === 'admin'
 }
 
+// Students can create/edit their own day records
+export function canEditOwnDays(role: string): boolean {
+  return role === 'admin' || role === 'student'
+}
+
 export function canViewAllUsers(role: string): boolean {
   return role === 'admin' || role === 'teacher'
 }

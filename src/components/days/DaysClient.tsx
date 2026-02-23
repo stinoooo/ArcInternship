@@ -2,16 +2,21 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { IDay, DayType } from '@/types'
+import { IDay, IUser, DayType } from '@/types'
 import { translations } from '@/i18n/translations'
 import { getDayName, formatDate, calculateHours, cn } from '@/lib/utils'
-import { Search, Filter, CheckCircle2, Circle, ChevronDown, ChevronUp, Save, RotateCcw } from 'lucide-react'
+import { Search, Filter, CheckCircle2, Circle, ChevronDown, ChevronUp, Save, RotateCcw, Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { StudentPicker } from '@/components/StudentPicker'
 
 interface Props {
   initialDays: IDay[]
   lang: string
-  isAdmin: boolean
+  canEdit: boolean
+  students?: IUser[]
+  selectedStudentId?: string
+  viewingStudentName?: string
+  isTeacherOrAdmin?: boolean
 }
 
 const DAY_TYPE_COLORS: Record<DayType, string> = {
@@ -22,7 +27,6 @@ const DAY_TYPE_COLORS: Record<DayType, string> = {
   feestdag: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
 }
 
-// Internship starts ISO week 7 of 2026
 const INTERNSHIP_START_ISO_WEEK = 7
 
 function getInternshipWeek(isoWeek: number): number {
@@ -36,10 +40,10 @@ function stageWeekLabel(isoWeek: number, lang: string): string {
   return `${n}${suffix} stageweek`
 }
 
-function DayRow({ day, lang, isAdmin, onUpdate }: {
+function DayRow({ day, lang, canEdit, onUpdate }: {
   day: IDay
   lang: string
-  isAdmin: boolean
+  canEdit: boolean
   onUpdate: (id: string, data: Partial<IDay>) => void
 }) {
   const router = useRouter()
@@ -47,7 +51,6 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
   const [saving, setSaving] = useState(false)
   const STORAGE_KEY = `arc:day:${day._id}`
 
-  // Restore unsaved state from sessionStorage on mount
   const getInitialDay = () => {
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY)
@@ -69,7 +72,6 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
   const noHoursTypes: DayType[] = ['vrij', 'ziek', 'feestdag']
   const isNoHours = noHoursTypes.includes(localDay.type)
 
-  // Save unsaved state to sessionStorage before version refresh
   useEffect(() => {
     if (!hasChanges) return
 
@@ -89,26 +91,19 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
     return () => window.removeEventListener('arc:beforeVersionRefresh', handleBeforeRefresh)
   }, [hasChanges, localDay, STORAGE_KEY])
 
-  // Clear sessionStorage after successful save
   const clearSavedState = () => {
     try { sessionStorage.removeItem(STORAGE_KEY) } catch { /* ignore */ }
   }
 
-  const hadRestoredState = (() => {
-    try { return !!sessionStorage.getItem(STORAGE_KEY) } catch { return false }
-  })()
-
   const handleChange = (field: keyof IDay, value: string | number | boolean | DayType) => {
     const updated = { ...localDay, [field]: value }
 
-    // Auto-calculate hours
     if (field === 'startTime' || field === 'endTime') {
       const start = field === 'startTime' ? value as string : localDay.startTime
       const end = field === 'endTime' ? value as string : localDay.endTime
       updated.hours = calculateHours(start, end)
     }
 
-    // Zero hours for non-work types
     if (field === 'type' && noHoursTypes.includes(value as DayType)) {
       updated.hours = 0
     } else if (field === 'type') {
@@ -168,7 +163,6 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
     }
   }
 
-  // Detect if state was restored from sessionStorage
   const wasRestored = hasChanges && (() => {
     try { return !!sessionStorage.getItem(STORAGE_KEY) } catch { return false }
   })()
@@ -181,7 +175,7 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
       {/* Row header */}
       <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4">
         {/* Complete toggle */}
-        {isAdmin ? (
+        {canEdit ? (
           <button onClick={handleToggleComplete} className="flex-shrink-0">
             {localDay.isComplete
               ? <CheckCircle2 size={20} className="text-green-500" />
@@ -215,7 +209,6 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
           <p className="text-xs font-medium text-[var(--text-primary)] sm:hidden">
             {new Date(localDay.date + 'T00:00:00').toLocaleDateString(lang === 'nl' ? 'nl-NL' : 'en-US', { day: '2-digit', month: '2-digit' })}
           </p>
-          {/* Restored state indicator */}
           {wasRestored && (
             <p className="text-[10px] text-amber-500 flex items-center gap-0.5 mt-0.5">
               <RotateCcw size={9} />
@@ -236,7 +229,6 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
           </p>
         </div>
 
-        {/* Expand button — visible to everyone */}
         <button
           onClick={() => setExpanded(!expanded)}
           className="flex-shrink-0 p-1.5 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--text-muted)] transition-colors"
@@ -252,8 +244,8 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
         </div>
       )}
 
-      {/* Read-only expanded view for guests */}
-      {expanded && !isAdmin && (
+      {/* Read-only expanded view */}
+      {expanded && !canEdit && (
         <div className="px-3 sm:px-4 pb-4 pt-3 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-3">
           {!(['vrij', 'ziek', 'feestdag'] as DayType[]).includes(localDay.type) && (
             <div className="flex gap-4 text-xs text-[var(--text-muted)]">
@@ -275,8 +267,8 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
         </div>
       )}
 
-      {/* Expanded edit form — admins only */}
-      {expanded && isAdmin && (
+      {/* Expanded edit form */}
+      {expanded && canEdit && (
         <div className="px-3 sm:px-4 pb-4 pt-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {/* Type */}
@@ -373,7 +365,15 @@ function DayRow({ day, lang, isAdmin, onUpdate }: {
   )
 }
 
-export function DaysClient({ initialDays, lang, isAdmin }: Props) {
+export function DaysClient({
+  initialDays,
+  lang,
+  canEdit,
+  students = [],
+  selectedStudentId = '',
+  viewingStudentName = '',
+  isTeacherOrAdmin = false,
+}: Props) {
   const [days, setDays] = useState<IDay[]>(initialDays)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -381,17 +381,14 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
   const [expandedWeeks, setExpandedWeeks] = useState<Set<number>>(new Set(
     Array.from(new Set(initialDays.map(d => d.weekNumber))).slice(-3)
   ))
-  const [hasRestoredWork, setHasRestoredWork] = useState(false)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
-  // Check if any unsaved work was restored from sessionStorage
   useEffect(() => {
     const hasRestored = initialDays.some(day => {
       try { return !!sessionStorage.getItem(`arc:day:${day._id}`) } catch { return false }
     })
     if (hasRestored) {
-      setHasRestoredWork(true)
       toast(t.unsavedRestored, { icon: '↩️', duration: 5000 })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -409,7 +406,6 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
     })
   }, [days, typeFilter, completedFilter, search])
 
-  // Group by week
   const weekGroups = useMemo(() => {
     const map = new Map<number, IDay[]>()
     filtered.forEach(day => {
@@ -441,7 +437,26 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
             {days.filter(d => d.isComplete).length} / {days.length} {lang === 'nl' ? 'dagen afgerond' : 'days completed'}
           </p>
         </div>
+        {isTeacherOrAdmin && (
+          <StudentPicker
+            students={students}
+            selectedStudentId={selectedStudentId}
+            lang={lang}
+          />
+        )}
       </div>
+
+      {/* Read-only banner for teachers viewing a student */}
+      {isTeacherOrAdmin && viewingStudentName && !canEdit && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-sm text-[var(--text-muted)]">
+          <Eye size={14} className="flex-shrink-0" />
+          <span>
+            {lang === 'nl'
+              ? `Logboek van ${viewingStudentName} (alleen lezen)`
+              : `${viewingStudentName}'s logbook (read only)`}
+          </span>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="card flex flex-col gap-2 sm:gap-3">
@@ -517,7 +532,7 @@ export function DaysClient({ initialDays, lang, isAdmin }: Props) {
                       key={day._id}
                       day={day}
                       lang={lang}
-                      isAdmin={isAdmin}
+                      canEdit={canEdit}
                       onUpdate={handleUpdate}
                     />
                   ))}

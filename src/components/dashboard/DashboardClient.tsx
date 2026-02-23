@@ -1,15 +1,20 @@
 'use client'
 
-import { IDay, DashboardStats } from '@/types'
+import { IDay, IUser, DashboardStats } from '@/types'
 import { translations } from '@/i18n/translations'
 import { getDayName, formatDate, getWeekNumber } from '@/lib/utils'
 import { Clock, CheckCircle, TrendingUp, Calendar, AlertCircle, Target } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { StudentPicker } from '@/components/StudentPicker'
 
 interface Props {
   stats: DashboardStats
   days: IDay[]
   lang: string
+  students?: IUser[]
+  selectedStudentId?: string
+  selectedStudent?: IUser | null
+  isTeacherOrAdmin?: boolean
 }
 
 const DAY_TYPE_COLORS: Record<string, string> = {
@@ -31,7 +36,6 @@ function stageWeekLabel(isoWeek: number, lang: string): string {
 }
 
 function getWeekDateRange(weekNumber: number, year: number): string {
-  // Get Monday and Friday of the given ISO week
   const jan4 = new Date(year, 0, 4)
   const dayOfWeek = jan4.getDay() || 7
   const week1Monday = new Date(jan4.getTime() - (dayOfWeek - 1) * 86400000)
@@ -41,33 +45,46 @@ function getWeekDateRange(weekNumber: number, year: number): string {
   return `${fmt(monday)}–${fmt(friday)}`
 }
 
-export function DashboardClient({ stats, days, lang }: Props) {
+function formatDateDisplay(iso: string | undefined): string {
+  if (!iso) return '–'
+  const d = new Date(iso + 'T00:00:00')
+  return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`
+}
+
+export function DashboardClient({
+  stats,
+  days,
+  lang,
+  students = [],
+  selectedStudentId = '',
+  selectedStudent,
+  isTeacherOrAdmin = false,
+}: Props) {
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
-  // Get current ISO week
   const today = new Date()
   const currentWeek = getWeekNumber(today)
   const currentYear = today.getFullYear()
 
-  // Select the 4-week window: current week + 3 previous weeks
-  // If current week is before or after internship, clamp to available data
   const allWeekNumbers = stats.weeks.map(w => w.weekNumber)
   const minWeek = allWeekNumbers.length > 0 ? Math.min(...allWeekNumbers) : currentWeek
   const maxWeek = allWeekNumbers.length > 0 ? Math.max(...allWeekNumbers) : currentWeek
 
-  // Show current week (or latest if current is outside range) + 3 previous
   const displayCurrentWeek = Math.min(Math.max(currentWeek, minWeek), maxWeek)
   const windowStart = displayCurrentWeek - 3
   const windowEnd = displayCurrentWeek
 
   const displayWeeks = stats.weeks
     .filter(w => w.weekNumber >= windowStart && w.weekNumber <= windowEnd)
-    .sort((a, b) => b.weekNumber - a.weekNumber) // Newest first
+    .sort((a, b) => b.weekNumber - a.weekNumber)
 
-  // Week range label
   const weekRangeLabel = displayWeeks.length > 0
     ? `${lang === 'nl' ? 'Weken' : 'Weeks'} ${windowStart}–${windowEnd}`
     : ''
+
+  // Period from student profile or fallback
+  const periodStart = formatDateDisplay(selectedStudent?.startDate ?? '2026-02-09')
+  const periodEnd = formatDateDisplay(selectedStudent?.endDate ?? '2026-07-10')
 
   const statCards = [
     {
@@ -112,8 +129,8 @@ export function DashboardClient({ stats, days, lang }: Props) {
     },
     {
       label: lang === 'nl' ? 'Periode' : 'Period',
-      value: '9 feb – 10 jul',
-      sub: '2026',
+      value: periodStart,
+      sub: `t/m ${periodEnd}`,
       icon: Calendar,
       color: 'text-arc-blue',
       bg: 'bg-arc-blue/10',
@@ -122,10 +139,28 @@ export function DashboardClient({ stats, days, lang }: Props) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Page title */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{t.dashboard}</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">{t.targetHours} · {t.internshipPeriod}: 09-02-2026 t/m 10-07-2026</p>
+      {/* Page title + student picker */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{t.dashboard}</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
+            {t.targetHours} · {t.internshipPeriod}: {periodStart} t/m {periodEnd}
+          </p>
+          {isTeacherOrAdmin && selectedStudent && (
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              {selectedStudent.internshipPlace
+                ? `${selectedStudent.internshipPlace}${selectedStudent.schoolName ? ` · ${selectedStudent.schoolName}` : ''}`
+                : selectedStudent.schoolName ?? ''}
+            </p>
+          )}
+        </div>
+        {isTeacherOrAdmin && (
+          <StudentPicker
+            students={students}
+            selectedStudentId={selectedStudentId}
+            lang={lang}
+          />
+        )}
       </div>
 
       {/* Progress bar */}
