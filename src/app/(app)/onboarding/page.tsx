@@ -12,8 +12,22 @@ export default function OnboardingPage() {
   const { data: session, update } = useSession()
   const router = useRouter()
   const user = session?.user as { id?: string; role?: string; language?: string; onboardingCompleted?: boolean }
-  const lang = user?.language || 'nl'
-  const t = translations[lang as 'nl' | 'en'] || translations.nl
+
+  // Language: read from localStorage (same key as login page) so the selection there carries over
+  const [lang, setLang] = useState<'nl' | 'en'>('nl')
+  useEffect(() => {
+    const saved = localStorage.getItem('login_lang') as 'nl' | 'en' | null
+    if (saved === 'nl' || saved === 'en') setLang(saved)
+    else if (user?.language === 'en') setLang('en')
+  }, [user?.language])
+
+  const toggleLang = () => {
+    const next: 'nl' | 'en' = lang === 'nl' ? 'en' : 'nl'
+    setLang(next)
+    localStorage.setItem('login_lang', next)
+  }
+
+  const t = translations[lang] || translations.nl
 
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
@@ -101,7 +115,15 @@ export default function OnboardingPage() {
   if (!session) return null
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4 relative">
+      {/* Language toggle */}
+      <button
+        onClick={toggleLang}
+        className="absolute top-4 right-4 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-arc-blue transition-colors"
+      >
+        {lang === 'nl' ? 'EN' : 'NL'}
+      </button>
+
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
