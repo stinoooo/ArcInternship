@@ -67,6 +67,41 @@
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
+
+  /* Legal page prose */
+  .prose-legal h2 {
+    @apply text-lg font-bold text-[var(--text-primary)] mt-10 mb-3;
+  }
+  .prose-legal h3 {
+    @apply text-base font-semibold text-[var(--text-primary)] mt-6 mb-2;
+  }
+  .prose-legal p {
+    @apply text-sm text-[var(--text-secondary)] leading-relaxed mb-4;
+  }
+  .prose-legal ul {
+    @apply list-disc list-outside pl-5 mb-4 space-y-1;
+  }
+  .prose-legal ul li {
+    @apply text-sm text-[var(--text-secondary)] leading-relaxed;
+  }
+  .prose-legal ol {
+    @apply list-decimal list-outside pl-5 mb-4 space-y-1;
+  }
+  .prose-legal ol li {
+    @apply text-sm text-[var(--text-secondary)] leading-relaxed;
+  }
+  .prose-legal strong {
+    @apply font-semibold text-[var(--text-primary)];
+  }
+  .prose-legal a {
+    @apply text-arc-blue hover:underline;
+  }
+  .prose-legal .legal-box {
+    @apply bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-4 my-6 text-sm text-[var(--text-muted)];
+  }
+  .prose-legal .legal-box p {
+    @apply mb-0 text-[var(--text-muted)];
+  }
 }
 
 @layer utilities {
