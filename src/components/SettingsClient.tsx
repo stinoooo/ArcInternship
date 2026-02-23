@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft, CalendarPlus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +34,7 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [approving, setApproving] = useState<string | null>(null)
   const [migrating, setMigrating] = useState(false)
   const [migrateTargetId, setMigrateTargetId] = useState(currentUserId)
+  const [seeding, setSeeding] = useState<string | null>(null)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -132,10 +133,13 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
         body: JSON.stringify({ targetUserId: migrateTargetId }),
       })
       if (res.ok) {
-        const { migrated, targetUsername } = await res.json()
+        const { migrated, merged, total, targetUsername } = await res.json()
+        const detail = merged > 0
+          ? (lang === 'nl' ? ` (${merged} samengevoegd)` : ` (${merged} merged)`)
+          : ''
         toast.success(lang === 'nl'
-          ? `${migrated} dag(en) toegewezen aan ${targetUsername}`
-          : `${migrated} day(s) assigned to ${targetUsername}`)
+          ? `${total} dag(en) overgebracht naar ${targetUsername}${detail}`
+          : `${total} day(s) moved to ${targetUsername}${detail}`)
       } else {
         toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
       }
@@ -143,6 +147,29 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
       toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
     } finally {
       setMigrating(false)
+    }
+  }
+
+  const handleSeedDays = async (userId: string, username: string) => {
+    setSeeding(userId)
+    try {
+      const res = await fetch('/api/days/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(lang === 'nl'
+          ? `${data.seeded} nieuwe dag(en) aangemaakt voor ${username}`
+          : `${data.seeded} new day(s) created for ${username}`)
+      } else {
+        toast.error(data.error || (lang === 'nl' ? 'Aanmaken mislukt' : 'Seeding failed'))
+      }
+    } catch {
+      toast.error(lang === 'nl' ? 'Aanmaken mislukt' : 'Seeding failed')
+    } finally {
+      setSeeding(null)
     }
   }
 
@@ -275,6 +302,20 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
                     {ROLE_ICONS[user.role]}
                     {getRoleLabel(user.role)}
                   </span>
+                )}
+                {/* Seed days: admins only, all users incl. self */}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleSeedDays(user._id, user.username)}
+                    disabled={seeding === user._id}
+                    className="p-1.5 text-[var(--text-muted)] hover:text-arc-blue hover:bg-arc-blue/10 rounded-lg transition-colors"
+                    title={lang === 'nl' ? 'Stagdagen genereren' : 'Generate internship days'}
+                  >
+                    {seeding === user._id
+                      ? <div className="w-4 h-4 border-2 border-arc-blue border-t-transparent rounded-full animate-spin" />
+                      : <CalendarPlus size={16} />
+                    }
+                  </button>
                 )}
                 {/* Delete: admins only, not self */}
                 {isAdmin && user._id !== currentUserId && (
