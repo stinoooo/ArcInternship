@@ -1,5 +1,5 @@
 export type DayType = 'werkdag' | 'thuiswerk' | 'vrij' | 'ziek' | 'feestdag'
-export type UserRole = 'admin' | 'guest'
+export type UserRole = 'guest' | 'student' | 'teacher' | 'admin'
 export type Language = 'nl' | 'en'
 
 export interface IUser {
@@ -11,6 +11,16 @@ export interface IUser {
   approved: boolean
   language: Language
   theme: 'light' | 'dark'
+  avatarUrl?: string
+  // Onboarding fields
+  onboardingCompleted: boolean
+  internshipPlace?: string
+  schoolName?: string
+  studentEmail?: string
+  requiredHours?: number
+  startDate?: string     // YYYY-MM-DD
+  endDate?: string       // YYYY-MM-DD
+  supervisorContact?: string
   createdAt: Date
   updatedAt: Date
 }

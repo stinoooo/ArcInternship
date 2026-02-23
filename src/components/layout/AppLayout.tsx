@@ -6,6 +6,8 @@ import { useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { MobileNav } from './MobileNav'
+import { VersionUpdateBanner } from '@/components/VersionUpdateBanner'
+import { translations } from '@/i18n/translations'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -15,6 +17,7 @@ interface AppLayoutProps {
 export function AppLayout({ children, lang }: AppLayoutProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const t = translations[lang as 'nl' | 'en'] || translations.nl
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
@@ -25,7 +28,7 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
       <div className="flex items-center justify-center h-screen bg-[var(--bg-primary)]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-2 border-arc-blue/30 border-t-arc-blue rounded-full animate-spin" />
-          <span className="text-[var(--text-muted)] text-sm">Laden...</span>
+          <span className="text-[var(--text-muted)] text-sm">{t.loading}</span>
         </div>
       </div>
     )
@@ -45,13 +48,16 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
         </main>
         <footer className="hidden md:block px-6 py-3 border-t border-[var(--border)] bg-[var(--bg-card)]">
           <p className="text-xs text-[var(--text-muted)] text-center">
-            Part of the ArcNode Network & Stinoo Network
+            {t.footerText}
           </p>
         </footer>
       </div>
 
       {/* Mobile bottom nav */}
       <MobileNav lang={lang} session={session} />
+
+      {/* Version update notification */}
+      <VersionUpdateBanner lang={lang} />
     </div>
   )
 }

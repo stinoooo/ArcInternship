@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Session } from 'next-auth'
-import { LayoutDashboard, CalendarDays, Download, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, Download, Settings, LogOut, User } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { translations } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
@@ -22,7 +22,8 @@ export function MobileNav({ lang, session }: MobileNavProps) {
     { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
     { href: '/days', label: t.days, icon: CalendarDays },
     { href: '/export', label: t.exportPage, icon: Download },
-    ...(user.role === 'admin' ? [{ href: '/settings', label: t.settings, icon: Settings }] : []),
+    ...(user.role === 'admin' || user.role === 'teacher' ? [{ href: '/settings', label: t.settings, icon: Settings }] : []),
+    { href: '/profile', label: t.profile, icon: User },
   ]
 
   return (

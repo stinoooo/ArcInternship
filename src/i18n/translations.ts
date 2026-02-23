@@ -1,7 +1,8 @@
 export const translations = {
   nl: {
     // Common
-    app: 'ArcInternship',
+    app: 'ArcStage',
+    appSubtitle: 'Stage Uren Registratie',
     save: 'Opslaan',
     cancel: 'Annuleren',
     delete: 'Verwijderen',
@@ -19,17 +20,19 @@ export const translations = {
     days: 'Dagen',
     exportPage: 'Export',
     settings: 'Instellingen',
+    profile: 'Profiel',
     logout: 'Uitloggen',
 
     // Login
     login: 'Inloggen',
-    loginTitle: 'Inloggen bij ArcInternship',
+    loginTitle: 'Inloggen bij ArcStage',
     loginSubtitle: 'Stage Uren Registratie',
     loginSubtitleCard: 'Toegang tot je stage-uren dashboard',
     email: 'E-mailadres',
     password: 'Wachtwoord',
     loginButton: 'Inloggen',
     loginError: 'Ongeldige inloggegevens. Probeer opnieuw.',
+    loginRateLimit: 'Te veel pogingen. Wacht even en probeer opnieuw.',
     loggingIn: 'Bezig...',
     noAccount: 'Nog geen account?',
     requestAccess: 'Toegang aanvragen',
@@ -71,6 +74,8 @@ export const translations = {
     internshipPeriod: 'Stageperiode',
     from: 'Van',
     to: 'Tot',
+    currentWeek: 'Deze week',
+    weekRange: 'Weken',
 
     // Day types
     werkdag: 'Werkdag',
@@ -113,6 +118,8 @@ export const translations = {
     username: 'Gebruikersnaam',
     role: 'Rol',
     admin: 'Beheerder',
+    teacher: 'Docent',
+    student: 'Student',
     guest: 'Gast',
     language: 'Taal',
     theme: 'Thema',
@@ -121,12 +128,45 @@ export const translations = {
     deleteUser: 'Gebruiker verwijderen',
     confirmDelete: 'Weet je zeker dat je deze gebruiker wilt verwijderen?',
 
+    // Profile
+    profileTitle: 'Mijn profiel',
+    changePassword: 'Wachtwoord wijzigen',
+    currentPassword: 'Huidig wachtwoord',
+    newPassword: 'Nieuw wachtwoord',
+    confirmNewPassword: 'Nieuw wachtwoord bevestigen',
+    passwordChanged: 'Wachtwoord succesvol gewijzigd',
+    passwordChangeError: 'Kon wachtwoord niet wijzigen',
+    uploadAvatar: 'Profielfoto uploaden',
+    avatarUpdated: 'Profielfoto bijgewerkt',
+    avatarError: 'Kon profielfoto niet uploaden',
+
+    // Onboarding
+    onboardingTitle: 'Welkom bij ArcStage',
+    onboardingSubtitle: 'Vul je stagegegevens in om te beginnen',
+    onboardingComplete: 'Aan de slag',
+    internshipPlace: 'Stagebedrijf',
+    schoolName: 'School',
+    studentEmail: 'Student e-mail',
+    requiredHours: 'Vereiste uren',
+    startDate: 'Startdatum',
+    endDate: 'Einddatum',
+    supervisorContact: 'Contactgegevens begeleider',
+    onboardingSuccess: 'Stagegegevens opgeslagen!',
+
+    // Version update
+    updateAvailable: 'Er is een nieuwe versie beschikbaar',
+    updateCountdown: 'Pagina wordt vernieuwd in',
+    updateNow: 'Nu vernieuwen',
+    updateSeconds: 'seconden',
+    unsavedRestored: 'Niet-opgeslagen wijzigingen hersteld',
+
     // Footer
     footerText: 'Part of the ArcNode Network & Stinoo Network',
   },
   en: {
     // Common
     app: 'ArcInternship',
+    appSubtitle: 'Internship Hours Registration',
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
@@ -144,6 +184,7 @@ export const translations = {
     days: 'Days',
     exportPage: 'Export',
     settings: 'Settings',
+    profile: 'Profile',
     logout: 'Logout',
 
     // Login
@@ -155,6 +196,7 @@ export const translations = {
     password: 'Password',
     loginButton: 'Login',
     loginError: 'Invalid credentials. Please try again.',
+    loginRateLimit: 'Too many attempts. Please wait and try again.',
     loggingIn: 'Logging in...',
     noAccount: 'No account yet?',
     requestAccess: 'Request access',
@@ -196,6 +238,8 @@ export const translations = {
     internshipPeriod: 'Internship Period',
     from: 'From',
     to: 'To',
+    currentWeek: 'Current week',
+    weekRange: 'Weeks',
 
     // Day types
     werkdag: 'Work Day',
@@ -238,6 +282,8 @@ export const translations = {
     username: 'Username',
     role: 'Role',
     admin: 'Admin',
+    teacher: 'Teacher',
+    student: 'Student',
     guest: 'Guest',
     language: 'Language',
     theme: 'Theme',
@@ -245,6 +291,38 @@ export const translations = {
     darkMode: 'Dark mode',
     deleteUser: 'Delete user',
     confirmDelete: 'Are you sure you want to delete this user?',
+
+    // Profile
+    profileTitle: 'My Profile',
+    changePassword: 'Change Password',
+    currentPassword: 'Current password',
+    newPassword: 'New password',
+    confirmNewPassword: 'Confirm new password',
+    passwordChanged: 'Password changed successfully',
+    passwordChangeError: 'Could not change password',
+    uploadAvatar: 'Upload profile picture',
+    avatarUpdated: 'Profile picture updated',
+    avatarError: 'Could not upload profile picture',
+
+    // Onboarding
+    onboardingTitle: 'Welcome to ArcInternship',
+    onboardingSubtitle: 'Fill in your internship details to get started',
+    onboardingComplete: 'Get Started',
+    internshipPlace: 'Internship Company',
+    schoolName: 'School',
+    studentEmail: 'Student email',
+    requiredHours: 'Required hours',
+    startDate: 'Start date',
+    endDate: 'End date',
+    supervisorContact: 'Supervisor contact',
+    onboardingSuccess: 'Internship details saved!',
+
+    // Version update
+    updateAvailable: 'A new version is available',
+    updateCountdown: 'Page will refresh in',
+    updateNow: 'Refresh now',
+    updateSeconds: 'seconds',
+    unsavedRestored: 'Unsaved changes restored',
 
     // Footer
     footerText: 'Part of the ArcNode Network & Stinoo Network',

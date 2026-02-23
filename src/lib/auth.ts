@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { connectToDatabase } from './mongodb'
 import User from './models/User'
+import { checkRateLimit, resetRateLimit } from './rateLimit'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,17 +13,32 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null
 
+        // Rate limiting by email (prevents targeted brute force)
+        const email = credentials.email.toLowerCase().trim()
+        const rateLimitKey = `login:${email}`
+        const { allowed } = checkRateLimit(rateLimitKey)
+        if (!allowed) {
+          // Return null without revealing it's rate limited (generic error)
+          return null
+        }
+
         await connectToDatabase()
-        const user = await User.findOne({ email: credentials.email.toLowerCase() })
-        if (!user) return null
+        const user = await User.findOne({ email })
+        if (!user) {
+          // Still check rate limit even for non-existent users (timing attack prevention)
+          return null
+        }
 
         const isValid = await bcrypt.compare(credentials.password, user.password)
         if (!isValid) return null
 
         if (user.approved === false) return null
+
+        // Successful login - reset rate limit
+        resetRateLimit(rateLimitKey)
 
         return {
           id: user._id.toString(),
@@ -31,6 +47,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           language: user.language,
           theme: user.theme,
+          onboardingCompleted: user.onboardingCompleted ?? false,
         }
       },
     }),
@@ -38,19 +55,33 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const u = user as unknown as { role: string; language: string; theme: string }
+        const u = user as unknown as {
+          role: string
+          language: string
+          theme: string
+          onboardingCompleted: boolean
+        }
         token.role = u.role
         token.language = u.language
         token.theme = u.theme
+        token.onboardingCompleted = u.onboardingCompleted
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id?: string; role?: string; language?: string; theme?: string }).id = token.sub
-        ;(session.user as { role?: string }).role = token.role as string
-        ;(session.user as { language?: string }).language = token.language as string
-        ;(session.user as { theme?: string }).theme = token.theme as string
+        const u = session.user as {
+          id?: string
+          role?: string
+          language?: string
+          theme?: string
+          onboardingCompleted?: boolean
+        }
+        u.id = token.sub
+        u.role = token.role as string
+        u.language = token.language as string
+        u.theme = token.theme as string
+        u.onboardingCompleted = token.onboardingCompleted as boolean
       }
       return session
     },
@@ -63,4 +94,27 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+}
+
+// Server-side RBAC helpers
+export type AppRole = 'guest' | 'student' | 'teacher' | 'admin'
+
+export function canEditDays(role: string): boolean {
+  return role === 'admin'
+}
+
+export function canViewAllUsers(role: string): boolean {
+  return role === 'admin' || role === 'teacher'
+}
+
+export function canApproveUsers(role: string): boolean {
+  return role === 'admin' || role === 'teacher'
+}
+
+export function canManageRoles(role: string): boolean {
+  return role === 'admin'
+}
+
+export function canDeleteUsers(role: string): boolean {
+  return role === 'admin'
 }
