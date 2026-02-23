@@ -9,18 +9,28 @@ import { IDay } from '@/types'
 
 export default async function DaysPage() {
   const session = await getServerSession(authOptions)
-  const cookieStore = cookies()
-  let lang = cookieStore.get('lang')?.value || 'nl'
   const userRole = (session?.user as { role?: string })?.role || 'guest'
 
+  // Language: DB is authoritative, cookie is fallback only
+  let lang = 'nl'
   try {
     await connectToDatabase()
     const userId = (session?.user as { id?: string })?.id
     if (userId) {
       const user = await User.findById(userId)
-      if (user?.language) lang = user.language
+      if (user?.language) {
+        lang = user.language
+      } else {
+        const cookieStore = cookies()
+        const cookieLang = cookieStore.get('lang')?.value
+        if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
+      }
     }
-  } catch (_e) {}
+  } catch (_e) {
+    const cookieStore = cookies()
+    const cookieLang = cookieStore.get('lang')?.value
+    if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
+  }
 
   await connectToDatabase()
   const days = await Day.find({}).sort({ date: 1 }).lean()

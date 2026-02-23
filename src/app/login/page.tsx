@@ -75,8 +75,8 @@ export default function LoginPage() {
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-arc-blue/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 text-center">
-          <Image src="/whitelogo.svg" alt="ArcInternship" width={80} height={80} className="mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-white mb-3">ArcInternship</h2>
+          <Image src="/whitelogo.svg" alt={t.app} width={80} height={80} className="mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-white mb-3">{t.app}</h2>
           <p className="text-slate-400 text-lg mb-8">{t.loginSubtitle}</p>
 
           <div className="space-y-4 text-left">
@@ -108,8 +108,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
-            <Image src="/bluelogo.svg" alt="ArcInternship" width={48} height={48} className="mx-auto mb-3" />
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">ArcInternship</h1>
+            <Image src="/bluelogo.svg" alt={t.app} width={48} height={48} className="mx-auto mb-3" />
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t.app}</h1>
           </div>
 
           <div className="card">

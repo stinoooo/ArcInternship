@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions, canEditDays } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/mongodb'
 import Day from '@/lib/models/Day'
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const user = session.user as { role?: string }
-  if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (!canEditDays(user.role ?? '')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   await connectToDatabase()
   const body = await req.json()

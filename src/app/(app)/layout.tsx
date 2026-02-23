@@ -10,21 +10,28 @@ export default async function AppRootLayout({ children }: { children: React.Reac
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  // Get user language preference
+  // Get user language: DB is authoritative, cookie is fallback only
   let lang = 'nl'
   try {
     await connectToDatabase()
     const userId = (session.user as { id?: string }).id
     if (userId) {
       const user = await User.findById(userId)
-      if (user?.language) lang = user.language
+      if (user?.language) {
+        lang = user.language
+      } else {
+        // DB lookup succeeded but no language set — check cookie as fallback
+        const cookieStore = cookies()
+        const cookieLang = cookieStore.get('lang')?.value
+        if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
+      }
     }
-  } catch (_e) {}
-
-  // Also check cookie as fallback
-  const cookieStore = cookies()
-  const cookieLang = cookieStore.get('lang')?.value
-  if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
+  } catch (_e) {
+    // DB unreachable — fall back to cookie
+    const cookieStore = cookies()
+    const cookieLang = cookieStore.get('lang')?.value
+    if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
+  }
 
   return <AppLayout lang={lang}>{children}</AppLayout>
 }

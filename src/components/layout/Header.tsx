@@ -7,6 +7,8 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { translations } from '@/i18n/translations'
+import { useEffect } from 'react'
 
 interface HeaderProps {
   lang: string
@@ -17,6 +19,12 @@ export function Header({ lang, session }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const [, startTransition] = useTransition()
   const router = useRouter()
+  const t = translations[lang as 'nl' | 'en'] || translations.nl
+
+  // Dynamically update document title based on language
+  useEffect(() => {
+    document.title = `${t.app} – ${t.appSubtitle}`
+  }, [t.app, t.appSubtitle])
 
   const toggleLanguage = async () => {
     const newLang = lang === 'nl' ? 'en' : 'nl'
@@ -27,9 +35,10 @@ export function Header({ lang, session }: HeaderProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language: newLang }),
       })
-      startTransition(() => router.refresh())
     }
-    document.cookie = `lang=${newLang}; path=/; max-age=31536000`
+    // Update cookie as fallback sync
+    document.cookie = `lang=${newLang}; path=/; max-age=31536000; SameSite=Lax`
+    startTransition(() => router.refresh())
     window.location.reload()
   }
 
@@ -48,15 +57,15 @@ export function Header({ lang, session }: HeaderProps) {
 
   return (
     <header className="h-14 sm:h-16 border-b border-[var(--border)] bg-[var(--bg-card)] flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
-      {/* Mobile: logo + name; Desktop: subtitle */}
+      {/* Mobile: logo + app name; Desktop: subtitle */}
       <div className="flex items-center gap-2 sm:gap-2">
         <div className="flex items-center gap-2 md:hidden">
-          <Image src="/bluelogo.svg" alt="ArcInternship" width={24} height={24} />
-          <span className="font-bold text-sm text-[var(--text-primary)]">ArcInternship</span>
+          <Image src="/bluelogo.svg" alt={t.app} width={24} height={24} />
+          <span className="font-bold text-sm text-[var(--text-primary)]">{t.app}</span>
         </div>
         <div className="hidden md:flex items-center gap-2">
           <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium">
-            Stage Uren Registratie
+            {t.appSubtitle}
           </span>
           <span className="text-[var(--text-muted)]">·</span>
           <span className="text-xs text-arc-blue font-semibold">9 feb – 10 jul 2026</span>

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Session } from 'next-auth'
-import { LayoutDashboard, CalendarDays, Download, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, Download, Settings, LogOut, User } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import { translations } from '@/i18n/translations'
@@ -23,7 +23,8 @@ export function Sidebar({ lang, session }: SidebarProps) {
     { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
     { href: '/days', label: t.days, icon: CalendarDays },
     { href: '/export', label: t.exportPage, icon: Download },
-    ...(user.role === 'admin' ? [{ href: '/settings', label: t.settings, icon: Settings }] : []),
+    ...(user.role === 'admin' || user.role === 'teacher' ? [{ href: '/settings', label: t.settings, icon: Settings }] : []),
+    { href: '/profile', label: t.profile, icon: User },
   ]
 
   return (
@@ -31,10 +32,10 @@ export function Sidebar({ lang, session }: SidebarProps) {
       {/* Logo */}
       <div className="p-6 border-b border-[var(--border)]">
         <div className="flex items-center gap-3">
-          <Image src="/bluelogo.svg" alt="ArcInternship" width={32} height={32} />
+          <Image src="/bluelogo.svg" alt={t.app} width={32} height={32} />
           <div>
-            <h1 className="font-bold text-sm text-[var(--text-primary)]">ArcInternship</h1>
-            <p className="text-xs text-[var(--text-muted)]">Stage Uren</p>
+            <h1 className="font-bold text-sm text-[var(--text-primary)]">{t.app}</h1>
+            <p className="text-xs text-[var(--text-muted)]">{t.appSubtitle}</p>
           </div>
         </div>
       </div>

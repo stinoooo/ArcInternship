@@ -1,26 +1,24 @@
 import { getServerSession } from 'next-auth'
-import { authOptions, canViewAllUsers } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+import { authOptions } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/mongodb'
 import User from '@/lib/models/User'
 import { cookies } from 'next/headers'
-import { SettingsClient } from '@/components/SettingsClient'
+import { ProfileClient } from '@/components/ProfileClient'
 import { IUser } from '@/types'
 
-export default async function SettingsPage() {
+export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
-  const user = session?.user as { role?: string; id?: string }
-
-  // Teachers and admins can access settings
-  if (!user?.role || !canViewAllUsers(user.role)) redirect('/dashboard')
+  const sessionUser = session?.user as { id?: string; role?: string }
 
   // Language: DB is authoritative, cookie is fallback only
   let lang = 'nl'
-  await connectToDatabase()
+  let user: IUser | null = null
   try {
-    const dbUser = await User.findById(user?.id)
-    if (dbUser?.language) {
-      lang = dbUser.language
+    await connectToDatabase()
+    const dbUser = await User.findById(sessionUser?.id, '-password')
+    if (dbUser) {
+      user = dbUser.toObject() as unknown as IUser
+      if (user.language) lang = user.language
     } else {
       const cookieStore = cookies()
       const cookieLang = cookieStore.get('lang')?.value
@@ -32,14 +30,10 @@ export default async function SettingsPage() {
     if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
   }
 
-  const users = await User.find({}, '-password').sort({ createdAt: 1 }).lean()
-
   return (
-    <SettingsClient
-      users={users as unknown as IUser[]}
+    <ProfileClient
+      user={user}
       lang={lang}
-      currentUserId={user?.id || ''}
-      currentUserRole={user?.role || 'guest'}
     />
   )
 }

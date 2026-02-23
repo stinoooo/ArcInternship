@@ -2,7 +2,7 @@
 
 import { IDay, DashboardStats } from '@/types'
 import { translations } from '@/i18n/translations'
-import { getDayName, formatDate } from '@/lib/utils'
+import { getDayName, formatDate, getWeekNumber } from '@/lib/utils'
 import { Clock, CheckCircle, TrendingUp, Calendar, AlertCircle, Target } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -24,19 +24,56 @@ const INTERNSHIP_START_ISO_WEEK = 7
 
 function stageWeekLabel(isoWeek: number, lang: string): string {
   const n = isoWeek - INTERNSHIP_START_ISO_WEEK + 1
-  if (lang === 'en') return `Internship wk ${n}`
+  if (n <= 0) return lang === 'nl' ? `Week ${isoWeek}` : `Week ${isoWeek}`
+  if (lang === 'en') return `Intern. wk ${n}`
   const suffix = n === 1 ? 'ste' : 'de'
-  return `${n}${suffix} stageweek`
+  return `${n}${suffix} wk`
+}
+
+function getWeekDateRange(weekNumber: number, year: number): string {
+  // Get Monday and Friday of the given ISO week
+  const jan4 = new Date(year, 0, 4)
+  const dayOfWeek = jan4.getDay() || 7
+  const week1Monday = new Date(jan4.getTime() - (dayOfWeek - 1) * 86400000)
+  const monday = new Date(week1Monday.getTime() + (weekNumber - 1) * 7 * 86400000)
+  const friday = new Date(monday.getTime() + 4 * 86400000)
+  const fmt = (d: Date) => `${d.getDate()}/${d.getMonth() + 1}`
+  return `${fmt(monday)}–${fmt(friday)}`
 }
 
 export function DashboardClient({ stats, days, lang }: Props) {
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
+  // Get current ISO week
+  const today = new Date()
+  const currentWeek = getWeekNumber(today)
+  const currentYear = today.getFullYear()
+
+  // Select the 4-week window: current week + 3 previous weeks
+  // If current week is before or after internship, clamp to available data
+  const allWeekNumbers = stats.weeks.map(w => w.weekNumber)
+  const minWeek = allWeekNumbers.length > 0 ? Math.min(...allWeekNumbers) : currentWeek
+  const maxWeek = allWeekNumbers.length > 0 ? Math.max(...allWeekNumbers) : currentWeek
+
+  // Show current week (or latest if current is outside range) + 3 previous
+  const displayCurrentWeek = Math.min(Math.max(currentWeek, minWeek), maxWeek)
+  const windowStart = displayCurrentWeek - 3
+  const windowEnd = displayCurrentWeek
+
+  const displayWeeks = stats.weeks
+    .filter(w => w.weekNumber >= windowStart && w.weekNumber <= windowEnd)
+    .sort((a, b) => b.weekNumber - a.weekNumber) // Newest first
+
+  // Week range label
+  const weekRangeLabel = displayWeeks.length > 0
+    ? `${lang === 'nl' ? 'Weken' : 'Weeks'} ${windowStart}–${windowEnd}`
+    : ''
+
   const statCards = [
     {
       label: t.completedHours,
       value: `${stats.completedHours}u`,
-      sub: `van ${stats.totalHours}u`,
+      sub: `${lang === 'nl' ? 'van' : 'of'} ${stats.totalHours}u`,
       icon: Clock,
       color: 'text-blue-500',
       bg: 'bg-blue-500/10',
@@ -60,7 +97,7 @@ export function DashboardClient({ stats, days, lang }: Props) {
     {
       label: t.completedDays,
       value: stats.completedDays,
-      sub: `van ${stats.totalWorkdays} ${lang === 'nl' ? 'dagen' : 'days'}`,
+      sub: `${lang === 'nl' ? 'van' : 'of'} ${stats.totalWorkdays} ${lang === 'nl' ? 'dagen' : 'days'}`,
       icon: CheckCircle,
       color: 'text-purple-500',
       bg: 'bg-purple-500/10',
@@ -82,8 +119,6 @@ export function DashboardClient({ stats, days, lang }: Props) {
       bg: 'bg-arc-blue/10',
     },
   ]
-
-  const recentWeeks = stats.weeks.slice(-4).reverse()
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -133,43 +168,69 @@ export function DashboardClient({ stats, days, lang }: Props) {
 
       {/* Week overview */}
       <div className="card">
-        <h2 className="font-semibold text-[var(--text-primary)] mb-3 sm:mb-4">{t.weekOverview}</h2>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="font-semibold text-[var(--text-primary)]">{t.weekOverview}</h2>
+          {weekRangeLabel && (
+            <span className="text-xs text-arc-blue font-medium bg-arc-blue/10 px-2.5 py-1 rounded-full">
+              {weekRangeLabel}
+            </span>
+          )}
+        </div>
         <div className="space-y-2">
-          {recentWeeks.length === 0 ? (
+          {displayWeeks.length === 0 ? (
             <p className="text-[var(--text-muted)] text-sm">{lang === 'nl' ? 'Geen weken beschikbaar' : 'No weeks available'}</p>
           ) : (
-            recentWeeks.map(week => (
-              <div key={week.weekNumber} className="flex items-center gap-2 sm:gap-4 p-2.5 sm:p-3 rounded-lg bg-[var(--bg-secondary)]">
-                <div className="text-center w-[60px] sm:w-[72px] flex-shrink-0">
-                  <p className="text-[10px] text-[var(--text-muted)] leading-tight font-medium">
-                    {stageWeekLabel(week.weekNumber, lang)}
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)] opacity-60">wk {week.weekNumber}</p>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex gap-1 flex-wrap">
-                    {week.days.map(day => (
-                      <div
-                        key={day.date}
-                        title={`${getDayName(day.dayOfWeek, lang, true)} ${formatDate(day.date, lang)} – ${day.hours}u`}
-                        className={cn(
-                          'w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center text-xs font-medium text-white',
-                          day.isComplete
-                            ? DAY_TYPE_COLORS[day.type] || 'bg-gray-400'
-                            : 'bg-[var(--border)] text-[var(--text-muted)]'
-                        )}
-                      >
-                        {getDayName(day.dayOfWeek, lang, true)[0]}
-                      </div>
-                    ))}
+            displayWeeks.map(week => {
+              const isCurrentWeek = week.weekNumber === currentWeek
+              const dateRange = getWeekDateRange(week.weekNumber, week.year || currentYear)
+              return (
+                <div
+                  key={week.weekNumber}
+                  className={cn(
+                    'flex items-center gap-2 sm:gap-4 p-2.5 sm:p-3 rounded-lg transition-colors',
+                    isCurrentWeek
+                      ? 'bg-arc-blue/5 border border-arc-blue/20'
+                      : 'bg-[var(--bg-secondary)]'
+                  )}
+                >
+                  <div className="text-center w-[72px] sm:w-[84px] flex-shrink-0">
+                    <div className="flex items-center gap-1 justify-center">
+                      <p className="text-[10px] text-[var(--text-muted)] leading-tight font-medium">
+                        {stageWeekLabel(week.weekNumber, lang)}
+                      </p>
+                      {isCurrentWeek && (
+                        <span className="text-[9px] bg-arc-blue text-arc-navy font-bold px-1 rounded leading-tight">
+                          {lang === 'nl' ? 'NU' : 'NOW'}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-[var(--text-muted)] opacity-60 mt-0.5">{dateRange}</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex gap-1 flex-wrap">
+                      {week.days.map(day => (
+                        <div
+                          key={day.date}
+                          title={`${getDayName(day.dayOfWeek, lang, true)} ${formatDate(day.date, lang)} – ${day.hours}u`}
+                          className={cn(
+                            'w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center text-xs font-medium',
+                            day.isComplete
+                              ? cn(DAY_TYPE_COLORS[day.type] || 'bg-gray-400', 'text-white')
+                              : 'bg-[var(--border)] text-[var(--text-muted)]'
+                          )}
+                        >
+                          {getDayName(day.dayOfWeek, lang, true)[0]}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold text-[var(--text-primary)]">{week.totalHours}u</p>
+                    <p className="text-xs text-[var(--text-muted)]">{week.completedDays}/{week.days.length} {lang === 'nl' ? 'dagen' : 'days'}</p>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-bold text-[var(--text-primary)]">{week.totalHours}u</p>
-                  <p className="text-xs text-[var(--text-muted)]">{week.completedDays}/{week.days.length} {lang === 'nl' ? 'dagen' : 'days'}</p>
-                </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </div>
