@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { MobileNav } from './MobileNav'
@@ -50,6 +51,19 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
           <p className="text-xs text-[var(--text-muted)] text-center">
             {t.footerText}
           </p>
+          <div className="flex items-center justify-center gap-3 mt-1">
+            <Link href="/privacy" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
+              {lang === 'nl' ? 'Privacybeleid' : 'Privacy Policy'}
+            </Link>
+            <span className="text-[var(--border)]">·</span>
+            <Link href="/terms" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
+              {lang === 'nl' ? 'Voorwaarden' : 'Terms'}
+            </Link>
+            <span className="text-[var(--border)]">·</span>
+            <Link href="/gebruik" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
+              {lang === 'nl' ? 'Gebruiksregels' : 'Usage Rules'}
+            </Link>
+          </div>
         </footer>
       </div>
 
