@@ -1,32 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { getServerSession } from 'next-auth'
-import { authOptions, canEditDays, canEditOwnDays } from '@/lib/auth'
+import { authOptions } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/mongodb'
 import Day from '@/lib/models/Day'
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const sessionUser = session.user as { id?: string; role?: string }
-  const role = sessionUser.role ?? 'guest'
-
-  if (!canEditOwnDays(role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  if (sessionUser.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   await connectToDatabase()
-
-  // Students can only edit their own days
-  if (!canEditDays(role)) {
-    const existing = await Day.findById(params.id)
-    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    if (existing.userId?.toString() !== sessionUser.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-  }
 
   const body = await req.json()
 
@@ -47,7 +36,7 @@ export async function PUT(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

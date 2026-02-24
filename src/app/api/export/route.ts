@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const sessionUser = session.user as { id?: string; role?: string }
+  const userId = sessionUser.id
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   await connectToDatabase()
 
@@ -19,16 +21,12 @@ export async function GET(req: NextRequest) {
   const lang = url.searchParams.get('lang') || 'nl'
   const completedOnly = url.searchParams.get('completed') === 'true'
 
-  // Admins can export any student via ?userId=..., otherwise scope to own account
-  const isAdmin = sessionUser.role === 'admin'
-  const targetUserId = (isAdmin && url.searchParams.get('userId')) || sessionUser.id
-
-  const query: Record<string, unknown> = { userId: targetUserId }
+  const query: Record<string, unknown> = { userId }
   if (completedOnly) query.isComplete = true
 
   const [days, currentUser] = await Promise.all([
     Day.find(query).sort({ date: 1 }),
-    User.findById(targetUserId, 'requiredHours username'),
+    User.findById(userId, 'requiredHours username'),
   ])
 
   const workbook = new ExcelJS.Workbook()
@@ -125,7 +123,6 @@ export async function GET(req: NextRequest) {
       cell.alignment = { vertical: 'middle' }
       cell.font = { size: 10 }
     })
-    // Complete column styling
     const completeCell = row.getCell(9)
     if (day.isComplete) {
       completeCell.font = { bold: true, color: { argb: 'FF16A34A' }, size: 10 }
