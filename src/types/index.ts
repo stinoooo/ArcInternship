@@ -21,6 +21,9 @@ export interface IUser {
   startDate?: string     // YYYY-MM-DD
   endDate?: string       // YYYY-MM-DD
   supervisorContact?: string
+  // Invite tracking
+  inviteCode?: string
+  invitedByUsername?: string
   createdAt: Date
   updatedAt: Date
 }

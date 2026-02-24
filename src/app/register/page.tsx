@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Eye, EyeOff, UserPlus } from 'lucide-react'
@@ -10,8 +10,10 @@ import { translations } from '@/i18n/translations'
 
 type Lang = 'nl' | 'en'
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteCode = searchParams.get('ref') || ''
   const [form, setForm] = useState({ email: '', username: '', password: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -46,7 +48,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, username: form.username, password: form.password }),
+        body: JSON.stringify({ email: form.email, username: form.username, password: form.password, ...(inviteCode ? { inviteCode } : {}) }),
       })
       const data = await res.json()
       if (res.ok) {
@@ -231,5 +233,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   )
 }

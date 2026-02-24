@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft, CalendarPlus, Link2, Copy } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, CalendarPlus, Link2, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +12,7 @@ interface Props {
   lang: string
   currentUserId: string
   currentUserRole: string
+  currentUserInviteCode: string
 }
 
 const ROLE_COLORS: Record<string, string> = {
@@ -28,12 +29,10 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
   guest: <User size={10} />,
 }
 
-export function SettingsClient({ users: initialUsers, lang, currentUserId, currentUserRole }: Props) {
+export function SettingsClient({ users: initialUsers, lang, currentUserId, currentUserRole, currentUserInviteCode }: Props) {
   const [users, setUsers] = useState<IUser[]>(initialUsers)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [approving, setApproving] = useState<string | null>(null)
-  const [migrating, setMigrating] = useState(false)
-  const [migrateTargetId, setMigrateTargetId] = useState(currentUserId)
   const [seeding, setSeeding] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
@@ -121,35 +120,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
     }
   }
 
-  const handleMigrate = async () => {
-    if (!migrateTargetId) return
-    if (!confirm(lang === 'nl'
-      ? 'Alle daglogboeken zonder eigenaar toewijzen aan deze gebruiker?'
-      : 'Assign all unowned day logs to this user?')) return
-    setMigrating(true)
-    try {
-      const res = await fetch('/api/days/migrate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUserId: migrateTargetId }),
-      })
-      if (res.ok) {
-        const { migrated, merged, total, targetUsername } = await res.json()
-        const detail = merged > 0
-          ? (lang === 'nl' ? ` (${merged} samengevoegd)` : ` (${merged} merged)`)
-          : ''
-        toast.success(lang === 'nl'
-          ? `${total} dag(en) overgebracht naar ${targetUsername}${detail}`
-          : `${total} day(s) moved to ${targetUsername}${detail}`)
-      } else {
-        toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
-      }
-    } catch {
-      toast.error(lang === 'nl' ? 'Migratie mislukt' : 'Migration failed')
-    } finally {
-      setMigrating(false)
-    }
-  }
 
   const handleSeedDays = async (userId: string, username: string) => {
     setSeeding(userId)
@@ -291,6 +261,11 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--text-primary)]">{user.username}</p>
                 <p className="text-xs text-[var(--text-muted)]">{user.email}</p>
+                {user.invitedByUsername && (
+                  <p className="text-xs text-[var(--text-muted)] opacity-60 mt-0.5">
+                    {lang === 'nl' ? 'via' : 'via'} {user.invitedByUsername}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {/* Role management: admins only, not for self */}
@@ -346,49 +321,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
         </div>
       </div>
 
-      {/* Legacy data migration — admins only */}
-      {isAdmin && (
-        <div className="card border border-amber-500/20">
-          <div className="flex items-center gap-2 mb-3">
-            <ArrowRightLeft size={16} className="text-amber-500" />
-            <h2 className="font-semibold text-[var(--text-primary)]">
-              {lang === 'nl' ? 'Daglogboek migratie' : 'Day Log Migration'}
-            </h2>
-          </div>
-          <p className="text-sm text-[var(--text-muted)] mb-4">
-            {lang === 'nl'
-              ? 'Wijs alle daglogboeken zonder eigenaar toe aan een gebruiker. Eenmalig uit te voeren.'
-              : 'Assign all unowned day logs to a user. Run this once.'}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <select
-              value={migrateTargetId}
-              onChange={e => setMigrateTargetId(e.target.value)}
-              className="input text-sm flex-1"
-            >
-              {active.map(u => (
-                <option key={u._id} value={u._id}>
-                  {u.username} ({u.email}){u._id === currentUserId ? (lang === 'nl' ? ' — mijn account' : ' — my account') : ''}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleMigrate}
-              disabled={migrating || !migrateTargetId}
-              className={cn(
-                'btn-primary flex items-center gap-2 whitespace-nowrap',
-                (!migrateTargetId || migrating) && 'opacity-40 cursor-not-allowed'
-              )}
-            >
-              {migrating
-                ? <div className="w-4 h-4 border-2 border-arc-navy border-t-transparent rounded-full animate-spin" />
-                : <ArrowRightLeft size={14} />}
-              {lang === 'nl' ? 'Migreer' : 'Migrate'}
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Invite link — visible to admins and teachers */}
       <div className="card">
         <div className="flex items-center gap-2 mb-3">
@@ -404,11 +336,13 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
         </p>
         <div className="flex items-center gap-2">
           <code className="flex-1 text-xs bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg px-3 py-2 text-[var(--text-muted)] truncate select-all">
-            {typeof window !== 'undefined' ? `${window.location.origin}/invite` : '/invite'}
+            {typeof window !== 'undefined'
+              ? `${window.location.origin}/invite/${currentUserInviteCode}`
+              : `/invite/${currentUserInviteCode}`}
           </code>
           <button
             onClick={() => {
-              const url = `${window.location.origin}/invite`
+              const url = `${window.location.origin}/invite/${currentUserInviteCode}`
               navigator.clipboard.writeText(url).then(() => {
                 setCopied(true)
                 setTimeout(() => setCopied(false), 2000)

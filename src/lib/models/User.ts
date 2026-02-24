@@ -26,6 +26,9 @@ const UserSchema = new Schema<UserDocument>(
     startDate: { type: String, default: '' },
     endDate: { type: String, default: '' },
     supervisorContact: { type: String, default: '' },
+    // Invite tracking
+    inviteCode: { type: String, unique: true, sparse: true },
+    invitedByUsername: { type: String, default: '' },
   },
   { timestamps: true }
 )

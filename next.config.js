@@ -8,6 +8,11 @@ const nextConfig = {
         destination: '/use',
         permanent: true,
       },
+      {
+        source: '/favicon.png',
+        destination: '/favicon.svg',
+        permanent: true,
+      },
     ]
   },
 }
