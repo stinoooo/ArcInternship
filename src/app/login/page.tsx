@@ -188,15 +188,15 @@ export default function LoginPage() {
           </p>
           <div className="flex items-center justify-center gap-3 mt-2">
             <Link href="/privacy" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
-              {lang === 'nl' ? 'Privacybeleid' : 'Privacy Policy'}
+              Privacy
             </Link>
             <span className="text-[var(--border)]">·</span>
             <Link href="/terms" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
-              {lang === 'nl' ? 'Voorwaarden' : 'Terms'}
+              Terms
             </Link>
             <span className="text-[var(--border)]">·</span>
-            <Link href="/gebruik" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
-              {lang === 'nl' ? 'Gebruiksregels' : 'Usage Rules'}
+            <Link href="/use" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
+              Use
             </Link>
           </div>
         </div>

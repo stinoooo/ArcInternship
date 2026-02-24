@@ -42,9 +42,9 @@ export function LegalLayout({ title, lastUpdated, children }: Props) {
           <p className="text-xs text-[var(--text-muted)] mb-3">Juridische documenten</p>
           <div className="flex flex-wrap gap-4">
             {[
-              { href: '/privacy', label: 'Privacybeleid' },
-              { href: '/terms', label: 'Servicevoorwaarden' },
-              { href: '/gebruik', label: 'Gebruiksvoorwaarden' },
+              { href: '/privacy', label: 'Privacy' },
+              { href: '/terms', label: 'Terms' },
+              { href: '/use', label: 'Use' },
             ].map(({ href, label }) => (
               <Link
                 key={href}

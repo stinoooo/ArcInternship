@@ -78,8 +78,11 @@ export function DashboardClient({
     .filter(w => w.weekNumber >= windowStart && w.weekNumber <= windowEnd)
     .sort((a, b) => b.weekNumber - a.weekNumber)
 
-  const weekRangeLabel = displayWeeks.length > 0
-    ? `${lang === 'nl' ? 'Weken' : 'Weeks'} ${windowStart}–${windowEnd}`
+  const displayedStageWeeks = displayWeeks
+    .map(w => w.weekNumber - INTERNSHIP_START_ISO_WEEK + 1)
+    .filter(n => n > 0)
+  const weekRangeLabel = displayedStageWeeks.length > 0
+    ? `${lang === 'nl' ? 'Weken' : 'Weeks'} ${Math.min(...displayedStageWeeks)}–${Math.max(...displayedStageWeeks)}`
     : ''
 
   // Period from student profile or fallback
