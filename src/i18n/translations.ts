@@ -130,6 +130,7 @@ export const translations = {
 
     // Profile
     profileTitle: 'Mijn profiel',
+    securityTitle: 'Beveiliging',
     changePassword: 'Wachtwoord wijzigen',
     currentPassword: 'Huidig wachtwoord',
     newPassword: 'Nieuw wachtwoord',
@@ -309,6 +310,7 @@ export const translations = {
 
     // Profile
     profileTitle: 'My Profile',
+    securityTitle: 'Security',
     changePassword: 'Change Password',
     currentPassword: 'Current password',
     newPassword: 'New password',

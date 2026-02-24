@@ -230,35 +230,43 @@ export function ProfileClient({ user, lang }: Props) {
         </p>
       </div>
 
-      {/* Change Email */}
+      {/* Security — email & password in one card */}
       <div className="card">
         <h2 className="font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-          <Mail size={16} />
-          {t.changeEmail}
+          <Lock size={16} />
+          {t.securityTitle}
         </h2>
-        <form onSubmit={handleEmailChange} className="space-y-3">
-          <div>
-            <label className="label">{t.newEmail}</label>
-            <input
-              type="email"
-              value={emailForm.newEmail}
-              onChange={e => setEmailForm(p => ({ ...p, newEmail: e.target.value }))}
-              className="input text-sm"
-              placeholder={user?.email}
-              autoComplete="email"
-              required
-            />
-          </div>
-          <div>
-            <label className="label">{t.confirmNewEmail}</label>
-            <input
-              type="email"
-              value={emailForm.confirmEmail}
-              onChange={e => setEmailForm(p => ({ ...p, confirmEmail: e.target.value }))}
-              className="input text-sm"
-              autoComplete="email"
-              required
-            />
+
+        {/* Email section */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)] mb-3 flex items-center gap-1.5">
+          <Mail size={11} />
+          {t.changeEmail}
+        </p>
+        <form onSubmit={handleEmailChange} className="space-y-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="label">{t.newEmail}</label>
+              <input
+                type="email"
+                value={emailForm.newEmail}
+                onChange={e => setEmailForm(p => ({ ...p, newEmail: e.target.value }))}
+                className="input text-sm"
+                placeholder={user?.email}
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">{t.confirmNewEmail}</label>
+              <input
+                type="email"
+                value={emailForm.confirmEmail}
+                onChange={e => setEmailForm(p => ({ ...p, confirmEmail: e.target.value }))}
+                className="input text-sm"
+                autoComplete="email"
+                required
+              />
+            </div>
           </div>
           <div>
             <label className="label">{t.currentPassword}</label>
@@ -274,16 +282,73 @@ export function ProfileClient({ user, lang }: Props) {
           <button
             type="submit"
             disabled={emailSaving}
-            className={cn(
-              'btn-secondary flex items-center gap-2',
-              emailSaving && 'opacity-50 cursor-not-allowed'
-            )}
+            className={cn('btn-secondary flex items-center gap-2', emailSaving && 'opacity-50 cursor-not-allowed')}
           >
             {emailSaving
               ? <div className="w-4 h-4 border-2 border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
-              : <Mail size={14} />
-            }
+              : <Mail size={14} />}
             {t.changeEmail}
+          </button>
+        </form>
+
+        <div className="border-t border-[var(--border)] my-4" />
+
+        {/* Password section */}
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)] mb-3 flex items-center gap-1.5">
+          <Lock size={11} />
+          {t.changePassword}
+        </p>
+        <form onSubmit={handlePasswordChange} className="space-y-3">
+          <div>
+            <label className="label">{t.currentPassword}</label>
+            <input
+              type="password"
+              value={pwForm.currentPassword}
+              onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))}
+              className="input text-sm"
+              autoComplete="current-password"
+              required
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="label">{t.newPassword}</label>
+              <input
+                type="password"
+                value={pwForm.newPassword}
+                onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))}
+                className="input text-sm"
+                autoComplete="new-password"
+                required
+                minLength={8}
+              />
+            </div>
+            <div>
+              <label className="label">{t.confirmNewPassword}</label>
+              <input
+                type="password"
+                value={pwForm.confirmPassword}
+                onChange={e => setPwForm(p => ({ ...p, confirmPassword: e.target.value }))}
+                className="input text-sm"
+                autoComplete="new-password"
+                required
+              />
+            </div>
+          </div>
+          <p className="text-xs text-[var(--text-muted)]">
+            {lang === 'nl'
+              ? 'Minimaal 8 tekens, hoofdletter, kleine letter en cijfer'
+              : 'Minimum 8 chars, uppercase, lowercase, and number'}
+          </p>
+          <button
+            type="submit"
+            disabled={pwSaving}
+            className={cn('btn-secondary flex items-center gap-2', pwSaving && 'opacity-50 cursor-not-allowed')}
+          >
+            {pwSaving
+              ? <div className="w-4 h-4 border-2 border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
+              : <Lock size={14} />}
+            {t.changePassword}
           </button>
         </form>
       </div>
@@ -400,69 +465,6 @@ export function ProfileClient({ user, lang }: Props) {
         </form>
       </div>}
 
-      {/* Change Password */}
-      <div className="card">
-        <h2 className="font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-          <Lock size={16} />
-          {t.changePassword}
-        </h2>
-        <form onSubmit={handlePasswordChange} className="space-y-3">
-          <div>
-            <label className="label">{t.currentPassword}</label>
-            <input
-              type="password"
-              value={pwForm.currentPassword}
-              onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))}
-              className="input text-sm"
-              autoComplete="current-password"
-              required
-            />
-          </div>
-          <div>
-            <label className="label">{t.newPassword}</label>
-            <input
-              type="password"
-              value={pwForm.newPassword}
-              onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))}
-              className="input text-sm"
-              autoComplete="new-password"
-              required
-              minLength={8}
-            />
-            <p className="text-xs text-[var(--text-muted)] mt-1">
-              {lang === 'nl'
-                ? 'Minimaal 8 tekens, hoofdletter, kleine letter en cijfer'
-                : 'Minimum 8 chars, uppercase, lowercase, and number'
-              }
-            </p>
-          </div>
-          <div>
-            <label className="label">{t.confirmNewPassword}</label>
-            <input
-              type="password"
-              value={pwForm.confirmPassword}
-              onChange={e => setPwForm(p => ({ ...p, confirmPassword: e.target.value }))}
-              className="input text-sm"
-              autoComplete="new-password"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={pwSaving}
-            className={cn(
-              'btn-secondary flex items-center gap-2',
-              pwSaving && 'opacity-50 cursor-not-allowed'
-            )}
-          >
-            {pwSaving
-              ? <div className="w-4 h-4 border-2 border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
-              : <Lock size={14} />
-            }
-            {t.changePassword}
-          </button>
-        </form>
-      </div>
     </div>
   )
 }
