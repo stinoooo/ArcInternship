@@ -11,9 +11,11 @@ export async function GET() {
 
     let entries = await Changelog.find({}).sort({ date: -1, version: -1 }).lean()
 
-    // Auto-seed on first use: if DB is empty, upsert all history entries
-    if (entries.length === 0) {
-      for (const entry of CHANGELOG_HISTORY) {
+    // Sync any missing entries from CHANGELOG_HISTORY into the DB
+    const dbVersions = new Set(entries.map((e: { version: string }) => e.version))
+    const missing = CHANGELOG_HISTORY.filter(e => !dbVersions.has(e.version))
+    if (missing.length > 0) {
+      for (const entry of missing) {
         await Changelog.findOneAndUpdate(
           { version: entry.version },
           { $set: entry },
