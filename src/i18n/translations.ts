@@ -2,7 +2,7 @@ export const translations = {
   nl: {
     // Common
     app: 'ArcStage',
-    appSubtitle: 'Stage Uren Registratie',
+    appSubtitle: '',
     save: 'Opslaan',
     cancel: 'Annuleren',
     delete: 'Verwijderen',
@@ -26,7 +26,7 @@ export const translations = {
     // Login
     login: 'Inloggen',
     loginTitle: 'Inloggen bij ArcStage',
-    loginSubtitle: 'Stage Uren Registratie',
+    loginSubtitle: '',
     loginSubtitleCard: 'Toegang tot je stage-uren dashboard',
     email: 'E-mailadres',
     password: 'Wachtwoord',
@@ -166,7 +166,7 @@ export const translations = {
   en: {
     // Common
     app: 'ArcInternship',
-    appSubtitle: 'Internship Hours Registration',
+    appSubtitle: '',
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
@@ -190,7 +190,7 @@ export const translations = {
     // Login
     login: 'Login',
     loginTitle: 'Login to ArcInternship',
-    loginSubtitle: 'Internship Hours Registration',
+    loginSubtitle: '',
     loginSubtitleCard: 'Access to your internship hours dashboard',
     email: 'Email address',
     password: 'Password',

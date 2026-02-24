@@ -33,20 +33,30 @@ export default async function DashboardPage() {
     if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
   }
 
-  // Load current user's profile (for requiredHours, name, etc.)
+  // Guests view the admin's data (read-only); all others view their own
+  const role = sessionUser?.role ?? 'guest'
+  let targetUserId = sessionUserId
+  if (role === 'guest' && sessionUserId) {
+    try {
+      const admin = await User.findOne({ role: 'admin' }, '_id').lean()
+      if (admin) targetUserId = (admin._id as unknown as { toString(): string }).toString()
+    } catch (_e) { /* fall back to own id */ }
+  }
+
+  // Load target user's profile (for requiredHours, name, etc.)
   let targetStudent: IUser | null = null
   try {
-    const self = sessionUserId ? await User.findById(sessionUserId, '-password').lean() : null
+    const self = targetUserId ? await User.findById(targetUserId, '-password').lean() : null
     targetStudent = self as unknown as IUser | null
   } catch (_e) { /* ignore */ }
 
   const targetHours = targetStudent?.requiredHours ?? DEFAULT_TARGET_HOURS
 
-  // Load current user's own days
+  // Load target user's days
   let days: IDay[] = []
   try {
-    if (sessionUserId) {
-      days = (await Day.find({ userId: sessionUserId }).sort({ date: 1 }).lean()) as unknown as IDay[]
+    if (targetUserId) {
+      days = (await Day.find({ userId: targetUserId }).sort({ date: 1 }).lean()) as unknown as IDay[]
     }
   } catch (_e) { /* ignore */ }
 

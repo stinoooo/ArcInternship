@@ -32,11 +32,19 @@ export default async function DaysPage() {
     if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
   }
 
-  // Always show the current user's own days
+  // Guests view the admin's data (read-only); all others view their own
+  let targetUserId = sessionUserId
+  if (role === 'guest' && sessionUserId) {
+    try {
+      const admin = await User.findOne({ role: 'admin' }, '_id').lean()
+      if (admin) targetUserId = (admin._id as unknown as { toString(): string }).toString()
+    } catch (_e) { /* fall back to own id */ }
+  }
+
   let days: IDay[] = []
   try {
-    if (sessionUserId) {
-      days = (await Day.find({ userId: sessionUserId }).sort({ date: 1 }).lean()) as unknown as IDay[]
+    if (targetUserId) {
+      days = (await Day.find({ userId: targetUserId }).sort({ date: 1 }).lean()) as unknown as IDay[]
     }
   } catch (_e) { /* ignore */ }
 
