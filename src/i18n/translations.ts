@@ -139,6 +139,12 @@ export const translations = {
     uploadAvatar: 'Profielfoto uploaden',
     avatarUpdated: 'Profielfoto bijgewerkt',
     avatarError: 'Kon profielfoto niet uploaden',
+    changeEmail: 'E-mailadres wijzigen',
+    newEmail: 'Nieuw e-mailadres',
+    confirmNewEmail: 'Nieuw e-mailadres bevestigen',
+    emailChanged: 'E-mailadres succesvol gewijzigd',
+    emailChangeError: 'Kon e-mailadres niet wijzigen',
+    emailAlreadyInUse: 'Dit e-mailadres is al in gebruik',
 
     // Onboarding
     onboardingTitle: 'Welkom bij ArcInternship',
@@ -312,6 +318,12 @@ export const translations = {
     uploadAvatar: 'Upload profile picture',
     avatarUpdated: 'Profile picture updated',
     avatarError: 'Could not upload profile picture',
+    changeEmail: 'Change Email Address',
+    newEmail: 'New email address',
+    confirmNewEmail: 'Confirm new email address',
+    emailChanged: 'Email address changed successfully',
+    emailChangeError: 'Could not change email address',
+    emailAlreadyInUse: 'This email address is already in use',
 
     // Onboarding
     onboardingTitle: 'Welcome to ArcInternship',
