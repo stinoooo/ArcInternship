@@ -20,7 +20,7 @@ export function LegalLayout({ title, lastUpdated, children }: Props) {
             <ArrowLeft size={15} />
             Terug
           </Link>
-          <span className="text-sm font-semibold text-arc-blue">ArcStage</span>
+          <span className="text-sm font-semibold text-arc-blue">ArcInternship</span>
         </div>
       </header>
 
@@ -56,7 +56,7 @@ export function LegalLayout({ title, lastUpdated, children }: Props) {
             ))}
           </div>
           <p className="text-xs text-[var(--text-muted)] mt-4">
-            &copy; {new Date().getFullYear()} ArcStage. Alle rechten voorbehouden.
+            &copy; {new Date().getFullYear()} ArcInternship. Alle rechten voorbehouden.
           </p>
         </footer>
       </main>

@@ -1,7 +1,7 @@
 export const translations = {
   nl: {
     // Common
-    app: 'ArcStage',
+    app: 'ArcInternship',
     appSubtitle: 'Stage Uren Registratie',
     save: 'Opslaan',
     cancel: 'Annuleren',
@@ -25,7 +25,7 @@ export const translations = {
 
     // Login
     login: 'Inloggen',
-    loginTitle: 'Inloggen bij ArcStage',
+    loginTitle: 'Inloggen bij ArcInternship',
     loginSubtitle: 'Stage Uren Registratie',
     loginSubtitleCard: 'Toegang tot je stage-uren dashboard',
     email: 'E-mailadres',
@@ -141,7 +141,7 @@ export const translations = {
     avatarError: 'Kon profielfoto niet uploaden',
 
     // Onboarding
-    onboardingTitle: 'Welkom bij ArcStage',
+    onboardingTitle: 'Welkom bij ArcInternship',
     onboardingSubtitle: 'Vul je stagegegevens in om te beginnen',
     onboardingComplete: 'Aan de slag',
     internshipPlace: 'Stagebedrijf',

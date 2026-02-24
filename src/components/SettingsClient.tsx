@@ -396,7 +396,7 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
           </h2>
           <div className="space-y-2">
             {[
-              { label: lang === 'nl' ? 'Applicatie' : 'Application', value: lang === 'nl' ? 'ArcStage' : 'ArcInternship' },
+              { label: lang === 'nl' ? 'Applicatie' : 'Application', value: 'ArcInternship' },
               { label: lang === 'nl' ? 'Stageperiode' : 'Internship Period', value: '09-02-2026 t/m 10-07-2026' },
               { label: lang === 'nl' ? 'Doelstelling' : 'Target', value: '760 uur' },
               { label: lang === 'nl' ? 'Standaard werktijd' : 'Default work hours', value: '09:00 – 17:00' },
