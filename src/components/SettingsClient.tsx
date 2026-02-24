@@ -290,8 +290,6 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
                     className="text-xs border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-arc-blue"
                   >
                     <option value="guest">{t.guest}</option>
-                    <option value="student">{t.student}</option>
-                    <option value="teacher">{t.teacher}</option>
                     <option value="admin">{t.admin}</option>
                   </select>
                 ) : (
