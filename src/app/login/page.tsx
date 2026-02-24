@@ -126,7 +126,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="input"
-                  placeholder="stijn@stinoo.dev"
+                  placeholder="email@email.com"
                   required
                 />
               </div>

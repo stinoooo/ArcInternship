@@ -22,11 +22,8 @@ export default function PrivacyPage() {
         Algemene Verordening Gegevensbescherming (AVG, Verordening (EU) 2016/679) is:
       </p>
       <ul>
-        <li><strong>Naam:</strong> [NAAM ORGANISATIE / NAAM BEHEERDER]</li>
-        <li><strong>Adres:</strong> [STRAAT EN HUISNUMMER, POSTCODE, STAD]</li>
-        <li><strong>KvK-nummer:</strong> [KVK-NUMMER]</li>
-        <li><strong>E-mailadres:</strong> [CONTACT@UW-DOMEIN.NL]</li>
-        <li><strong>Telefoonnummer:</strong> [TELEFOONNUMMER]</li>
+        <li><strong>Naam:</strong> Arcnode Network</li>
+        <li><strong>E-mailadres:</strong> [hello@arcnode.dev]</li>
       </ul>
       <p>
         Wij hebben geen functionaris voor gegevensbescherming (FG) aangesteld. Voor vragen
