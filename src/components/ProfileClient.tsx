@@ -20,6 +20,7 @@ export function ProfileClient({ user, lang }: Props) {
   const t = translations[lang as 'nl' | 'en'] || translations.nl
   const fileInputRef = useRef<HTMLInputElement>(null)
   const sessionUser = session?.user as { id?: string; role?: string }
+  const isGuest = sessionUser?.role === 'guest'
 
   // Password form
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
@@ -198,8 +199,8 @@ export function ProfileClient({ user, lang }: Props) {
         </p>
       </div>
 
-      {/* Internship details */}
-      <div className="card">
+      {/* Internship details — hidden for guest accounts */}
+      {!isGuest && <div className="card">
         <h2 className="font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
           <Building2 size={16} />
           {lang === 'nl' ? 'Stagegegevens' : 'Internship Details'}
@@ -308,7 +309,7 @@ export function ProfileClient({ user, lang }: Props) {
             {t.save}
           </button>
         </form>
-      </div>
+      </div>}
 
       {/* Change Password */}
       <div className="card">

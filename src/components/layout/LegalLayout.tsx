@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { VersionUpdateBanner } from '@/components/VersionUpdateBanner'
 
 interface Props {
   title: string
@@ -60,6 +61,8 @@ export function LegalLayout({ title, lastUpdated, children }: Props) {
           </p>
         </footer>
       </main>
+      {/* Version update banner — also active on public legal pages */}
+      <VersionUpdateBanner lang="nl" />
     </div>
   )
 }

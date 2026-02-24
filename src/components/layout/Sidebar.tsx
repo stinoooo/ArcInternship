@@ -84,7 +84,12 @@ export function Sidebar({ lang, session }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-[var(--text-primary)] truncate">{session.user?.name}</p>
-            <p className="text-xs text-[var(--text-muted)] capitalize">{user.role}</p>
+            <p className="text-xs text-[var(--text-muted)]">
+              {user.role === 'admin' ? t.admin
+                : user.role === 'teacher' ? t.teacher
+                : user.role === 'student' ? t.student
+                : t.guest}
+            </p>
           </div>
         </div>
         <button
