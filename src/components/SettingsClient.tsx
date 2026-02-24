@@ -210,8 +210,13 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
                 key={user._id}
                 className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)]"
               >
-                <div className="w-9 h-9 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center text-sm font-bold">
-                  {user.username[0]?.toUpperCase()}
+                <div className="w-9 h-9 rounded-full bg-amber-500/10 text-amber-600 flex-shrink-0 overflow-hidden flex items-center justify-center text-sm font-bold">
+                  {user.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                  ) : (
+                    user.username[0]?.toUpperCase()
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[var(--text-primary)]">{user.username}</p>
@@ -272,10 +277,15 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
               className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)]"
             >
               <div className={cn(
-                'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold',
+                'w-9 h-9 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center text-sm font-bold',
                 ROLE_COLORS[user.role] || ROLE_COLORS.guest
               )}>
-                {user.username[0]?.toUpperCase()}
+                {user.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                ) : (
+                  user.username[0]?.toUpperCase()
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--text-primary)]">{user.username}</p>

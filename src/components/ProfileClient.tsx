@@ -15,7 +15,7 @@ interface Props {
 }
 
 export function ProfileClient({ user, lang }: Props) {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const router = useRouter()
   const t = translations[lang as 'nl' | 'en'] || translations.nl
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -51,6 +51,7 @@ export function ProfileClient({ user, lang }: Props) {
       if (res.ok) {
         const data = await res.json()
         setAvatarUrl(data.avatarUrl)
+        await update({ avatarUrl: data.avatarUrl })
         toast.success(t.avatarUpdated)
         router.refresh()
       } else {
