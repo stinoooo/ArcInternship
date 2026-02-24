@@ -127,6 +127,11 @@ export const translations = {
     darkMode: 'Donkere modus',
     deleteUser: 'Gebruiker verwijderen',
     confirmDelete: 'Weet je zeker dat je deze gebruiker wilt verwijderen?',
+    confirmDeny: 'Aanvraag weigeren en account verwijderen?',
+    deleteAccount: 'Account verwijderen',
+    confirmDeleteAccount: 'Weet je zeker dat je je account wilt verwijderen?',
+    deleteAccountWarning: 'Dit verwijdert je account en alle bijbehorende data permanent. Dit kan niet ongedaan worden gemaakt.',
+    deleteAccountBtn: 'Ja, verwijder mijn account',
 
     // Profile
     profileTitle: 'Mijn profiel',
@@ -307,6 +312,11 @@ export const translations = {
     darkMode: 'Dark mode',
     deleteUser: 'Delete user',
     confirmDelete: 'Are you sure you want to delete this user?',
+    confirmDeny: 'Deny request and delete account?',
+    deleteAccount: 'Delete account',
+    confirmDeleteAccount: 'Are you sure you want to delete your account?',
+    deleteAccountWarning: 'This permanently deletes your account and all associated data. This cannot be undone.',
+    deleteAccountBtn: 'Yes, delete my account',
 
     // Profile
     profileTitle: 'My Profile',

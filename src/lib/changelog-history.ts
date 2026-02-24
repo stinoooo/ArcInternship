@@ -268,4 +268,16 @@ export const CHANGELOG_HISTORY = [
       'Remove "Generate internship days" button from settings',
     ],
   },
+  {
+    version: '5.9.2',
+    date: '2026-02-24',
+    nl: [
+      'Bevestigingsvenster bij verwijderen van gebruikers is nu een modal popup (geen browser alert meer)',
+      'Gebruikers kunnen hun eigen account verwijderen via de profielpagina (verwijdert alle data)',
+    ],
+    en: [
+      'Delete user confirmation is now a modal popup instead of a browser alert',
+      'Users can delete their own account from the profile page (removes all data)',
+    ],
+  },
 ]
