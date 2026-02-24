@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -19,10 +19,18 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const t = translations[lang as 'nl' | 'en'] || translations.nl
+  const [appVersion, setAppVersion] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
   }, [status, router])
+
+  useEffect(() => {
+    fetch('/api/version', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d?.version && setAppVersion(d.version))
+      .catch(() => {})
+  }, [])
 
   if (status === 'loading') {
     return (
@@ -48,9 +56,14 @@ export function AppLayout({ children, lang }: AppLayoutProps) {
           {children}
         </main>
         <footer className="hidden md:block px-6 py-3 border-t border-[var(--border)] bg-[var(--bg-card)]">
-          <p className="text-xs text-[var(--text-muted)] text-center">
-            {t.footerText}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-xs text-[var(--text-muted)] text-center">
+              {t.footerText}
+            </p>
+            {appVersion && (
+              <span className="text-xs font-mono text-[var(--text-muted)] opacity-60">v{appVersion}</span>
+            )}
+          </div>
           <div className="flex items-center justify-center gap-3 mt-1">
             <Link href="/privacy" className="text-xs text-[var(--text-muted)] hover:text-arc-blue transition-colors">
               Privacy

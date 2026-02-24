@@ -16,7 +16,10 @@ export function VersionUpdateBanner({ lang }: Props) {
   const t = translations[lang as 'nl' | 'en'] || translations.nl
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
+  const [fromVersion, setFromVersion] = useState<string | null>(null)
+  const [toVersion, setToVersion] = useState<string | null>(null)
   const initialBuildId = useRef<number | null>(null)
+  const initialVersion = useRef<string | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const doRefresh = useCallback(() => {
@@ -55,13 +58,17 @@ export function VersionUpdateBanner({ lang }: Props) {
         if (!res.ok) return
         const data = await res.json()
         const buildId = data.buildId as number
+        const version = data.version as string
 
         if (initialBuildId.current === null) {
           initialBuildId.current = buildId
+          initialVersion.current = version
           return
         }
 
         if (buildId !== initialBuildId.current) {
+          setFromVersion(initialVersion.current)
+          setToVersion(version)
           setUpdateAvailable(true)
         }
       } catch {
@@ -87,7 +94,12 @@ export function VersionUpdateBanner({ lang }: Props) {
     )}>
       <RefreshCw size={18} className="flex-shrink-0 animate-spin" style={{ animationDuration: '3s' }} />
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm">{t.updateAvailable}</p>
+        <p className="font-semibold text-sm">
+          {t.updateAvailable}
+          {fromVersion && toVersion && fromVersion !== toVersion && (
+            <span className="ml-1.5 font-mono opacity-80 text-xs">v{fromVersion} → v{toVersion}</span>
+          )}
+        </p>
         <p className="text-xs opacity-80">{t.updateCountdown} {countdown} {t.updateSeconds}</p>
       </div>
       <button
