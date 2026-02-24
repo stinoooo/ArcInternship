@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
+import { version } from '../../../../package.json'
 
 // Server start time — changes on every restart/deployment
 const SERVER_START_TIME = Date.now()
-const APP_VERSION = process.env.npm_package_version || '1.0.0'
+const APP_VERSION = version
 
 export const dynamic = 'force-dynamic'
 
