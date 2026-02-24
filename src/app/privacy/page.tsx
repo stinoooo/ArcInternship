@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalLayout title="Privacybeleid" lastUpdated="23 februari 2026">
+    <LegalLayout title="Privacybeleid" lastUpdated="24 februari 2026">
       <div className="legal-box">
         <p>
           Dit privacybeleid is van toepassing op alle persoonsgegevens die worden verwerkt door

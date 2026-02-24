@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalLayout title="Servicevoorwaarden" lastUpdated="23 februari 2026">
+    <LegalLayout title="Servicevoorwaarden" lastUpdated="24 februari 2026">
       <div className="legal-box">
         <p>
           Deze servicevoorwaarden (ook wel: <em>algemene voorwaarden</em>) zijn van toepassing
