@@ -375,58 +375,6 @@ export function ProfileClient({ user, lang }: Props) {
         </form>
       </div>
 
-      {/* Delete account */}
-      <div className="card border border-arc-error/20 bg-arc-error/5">
-        <h2 className="font-semibold text-arc-error mb-1 flex items-center gap-2">
-          <Trash2 size={16} />
-          {t.deleteAccount}
-        </h2>
-        <p className="text-sm text-[var(--text-muted)] mb-4">{t.deleteAccountWarning}</p>
-        <button
-          onClick={() => setShowDeleteModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-arc-error/10 text-arc-error hover:bg-arc-error/20 transition-colors text-sm font-medium border border-arc-error/20"
-        >
-          <Trash2 size={14} />
-          {t.deleteAccount}
-        </button>
-      </div>
-
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !accountDeleting && setShowDeleteModal(false)} />
-          <div className="relative bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 w-9 h-9 rounded-full bg-arc-error/10 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle size={18} className="text-arc-error" />
-              </div>
-              <div>
-                <p className="font-semibold text-[var(--text-primary)]">{t.confirmDeleteAccount}</p>
-                <p className="text-sm text-[var(--text-muted)] mt-1">{t.deleteAccountWarning}</p>
-              </div>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                disabled={accountDeleting}
-                className="btn-secondary text-sm px-4 py-2"
-              >
-                {t.cancel}
-              </button>
-              <button
-                onClick={handleDeleteAccount}
-                disabled={accountDeleting}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-arc-error text-white text-sm font-medium hover:bg-arc-error/90 transition-colors disabled:opacity-60"
-              >
-                {accountDeleting
-                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <Trash2 size={14} />}
-                {t.deleteAccountBtn}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Internship details — hidden for guest accounts */}
       {!isGuest && <div className="card">
         <h2 className="font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
@@ -538,6 +486,58 @@ export function ProfileClient({ user, lang }: Props) {
           </button>
         </form>
       </div>}
+
+      {/* Delete account */}
+      <div className="card border border-arc-error/20 bg-arc-error/5">
+        <h2 className="font-semibold text-arc-error mb-1 flex items-center gap-2">
+          <Trash2 size={16} />
+          {t.deleteAccount}
+        </h2>
+        <p className="text-sm text-[var(--text-muted)] mb-4">{t.deleteAccountWarning}</p>
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-arc-error/10 text-arc-error hover:bg-arc-error/20 transition-colors text-sm font-medium border border-arc-error/20"
+        >
+          <Trash2 size={14} />
+          {t.deleteAccount}
+        </button>
+      </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !accountDeleting && setShowDeleteModal(false)} />
+          <div className="relative bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 w-9 h-9 rounded-full bg-arc-error/10 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={18} className="text-arc-error" />
+              </div>
+              <div>
+                <p className="font-semibold text-[var(--text-primary)]">{t.confirmDeleteAccount}</p>
+                <p className="text-sm text-[var(--text-muted)] mt-1">{t.deleteAccountWarning}</p>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={accountDeleting}
+                className="btn-secondary text-sm px-4 py-2"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={accountDeleting}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-arc-error text-white text-sm font-medium hover:bg-arc-error/90 transition-colors disabled:opacity-60"
+              >
+                {accountDeleting
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <Trash2 size={14} />}
+                {t.deleteAccountBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
