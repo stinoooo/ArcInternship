@@ -258,4 +258,14 @@ export const CHANGELOG_HISTORY = [
       '/favicon.png 404 resolved',
     ],
   },
+  {
+    version: '4.8.1',
+    date: '2026-02-24',
+    nl: [
+      'Knop "Stagdagen genereren" verwijderd uit de instellingen',
+    ],
+    en: [
+      'Remove "Generate internship days" button from settings',
+    ],
+  },
 ]
