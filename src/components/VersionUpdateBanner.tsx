@@ -5,7 +5,7 @@ import { RefreshCw } from 'lucide-react'
 import { translations } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
 
-const POLL_INTERVAL = 5 * 60 * 1000 // Check every 5 minutes
+const POLL_INTERVAL = 2 * 60 * 1000 // Check every 2 minutes
 const COUNTDOWN_SECONDS = 15
 
 interface Props {

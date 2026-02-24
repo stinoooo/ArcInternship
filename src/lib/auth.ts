@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
           language: user.language,
           theme: user.theme,
           onboardingCompleted: user.onboardingCompleted ?? false,
+          avatarUrl: user.avatarUrl || '',
         }
       },
     }),
@@ -60,11 +61,13 @@ export const authOptions: NextAuthOptions = {
           language: string
           theme: string
           onboardingCompleted: boolean
+          avatarUrl: string
         }
         token.role = u.role
         token.language = u.language
         token.theme = u.theme
         token.onboardingCompleted = u.onboardingCompleted
+        token.avatarUrl = u.avatarUrl
       }
       // Handle client-side session.update() calls
       if (trigger === 'update' && session) {
@@ -77,6 +80,9 @@ export const authOptions: NextAuthOptions = {
         if (session.theme === 'light' || session.theme === 'dark') {
           token.theme = session.theme
         }
+        if (typeof session.avatarUrl === 'string') {
+          token.avatarUrl = session.avatarUrl
+        }
       }
       return token
     },
@@ -88,12 +94,14 @@ export const authOptions: NextAuthOptions = {
           language?: string
           theme?: string
           onboardingCompleted?: boolean
+          avatarUrl?: string
         }
         u.id = token.sub
         u.role = token.role as string
         u.language = token.language as string
         u.theme = token.theme as string
         u.onboardingCompleted = token.onboardingCompleted as boolean
+        u.avatarUrl = token.avatarUrl as string
       }
       return session
     },

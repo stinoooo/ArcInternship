@@ -17,7 +17,7 @@ interface SidebarProps {
 export function Sidebar({ lang, session }: SidebarProps) {
   const pathname = usePathname()
   const t = translations[lang as 'nl' | 'en'] || translations.nl
-  const user = session.user as { role?: string }
+  const user = session.user as { role?: string; avatarUrl?: string }
 
   const navItems = [
     { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
@@ -65,8 +65,13 @@ export function Sidebar({ lang, session }: SidebarProps) {
       {/* User section */}
       <div className="p-4 border-t border-[var(--border)]">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-arc-blue/20 border border-arc-blue/30 flex items-center justify-center text-arc-blue text-sm font-bold">
-            {session.user?.name?.[0]?.toUpperCase() || 'U'}
+          <div className="w-8 h-8 rounded-full bg-arc-blue/20 border border-arc-blue/30 overflow-hidden flex items-center justify-center text-arc-blue text-sm font-bold flex-shrink-0">
+            {user.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.avatarUrl} alt={session.user?.name || ''} className="w-full h-full object-cover" />
+            ) : (
+              session.user?.name?.[0]?.toUpperCase() || 'U'
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-[var(--text-primary)] truncate">{session.user?.name}</p>
