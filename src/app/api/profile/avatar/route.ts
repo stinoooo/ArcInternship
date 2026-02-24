@@ -12,6 +12,19 @@ const ALLOWED_TYPES = new Set([
   'image/webp',
 ])
 
+export async function GET() {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const userId = (session.user as { id?: string }).id
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  await connectToDatabase()
+  const user = await User.findById(userId, 'avatarUrl').lean()
+
+  return NextResponse.json({ avatarUrl: (user as { avatarUrl?: string } | null)?.avatarUrl || '' })
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

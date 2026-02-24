@@ -8,6 +8,7 @@ import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import { translations } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
+import { useState, useEffect } from 'react'
 
 interface SidebarProps {
   lang: string
@@ -17,7 +18,15 @@ interface SidebarProps {
 export function Sidebar({ lang, session }: SidebarProps) {
   const pathname = usePathname()
   const t = translations[lang as 'nl' | 'en'] || translations.nl
-  const user = session.user as { role?: string; avatarUrl?: string }
+  const user = session.user as { role?: string }
+  const [avatarUrl, setAvatarUrl] = useState('')
+
+  useEffect(() => {
+    fetch('/api/profile/avatar', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d?.avatarUrl && setAvatarUrl(d.avatarUrl))
+      .catch(() => {})
+  }, [])
 
   const navItems = [
     { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
@@ -66,9 +75,9 @@ export function Sidebar({ lang, session }: SidebarProps) {
       <div className="p-4 border-t border-[var(--border)]">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
           <div className="w-8 h-8 rounded-full bg-arc-blue/20 border border-arc-blue/30 overflow-hidden flex items-center justify-center text-arc-blue text-sm font-bold flex-shrink-0">
-            {user.avatarUrl ? (
+            {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.avatarUrl} alt={session.user?.name || ''} className="w-full h-full object-cover" />
+              <img src={avatarUrl} alt={session.user?.name || ''} className="w-full h-full object-cover" />
             ) : (
               session.user?.name?.[0]?.toUpperCase() || 'U'
             )}
