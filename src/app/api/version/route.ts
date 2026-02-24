@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { version } from '../../../../package.json'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pkg = require('../../../../package.json') as { version: string }
 
 // Server start time — changes on every restart/deployment
 const SERVER_START_TIME = Date.now()
-const APP_VERSION = version
+const APP_VERSION: string = pkg.version
 
 export const dynamic = 'force-dynamic'
 

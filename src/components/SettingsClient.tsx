@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft, CalendarPlus } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, ArrowRightLeft, CalendarPlus, Link2, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -35,6 +35,7 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [migrating, setMigrating] = useState(false)
   const [migrateTargetId, setMigrateTargetId] = useState(currentUserId)
   const [seeding, setSeeding] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -387,6 +388,46 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
           </div>
         </div>
       )}
+
+      {/* Invite link — visible to admins and teachers */}
+      <div className="card">
+        <div className="flex items-center gap-2 mb-3">
+          <Link2 size={16} className="text-arc-blue" />
+          <h2 className="font-semibold text-[var(--text-primary)]">
+            {lang === 'nl' ? 'Uitnodigingslink' : 'Invite Link'}
+          </h2>
+        </div>
+        <p className="text-sm text-[var(--text-muted)] mb-4">
+          {lang === 'nl'
+            ? 'Deel deze link zodat anderen een account kunnen aanvragen. Aanvragen worden handmatig goedgekeurd.'
+            : 'Share this link so others can request an account. Requests are approved manually.'}
+        </p>
+        <div className="flex items-center gap-2">
+          <code className="flex-1 text-xs bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg px-3 py-2 text-[var(--text-muted)] truncate select-all">
+            {typeof window !== 'undefined' ? `${window.location.origin}/invite` : '/invite'}
+          </code>
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}/invite`
+              navigator.clipboard.writeText(url).then(() => {
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+              }).catch(() => {})
+            }}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all flex-shrink-0',
+              copied
+                ? 'bg-arc-success/15 text-arc-success border border-arc-success/30'
+                : 'bg-arc-blue/10 text-arc-blue hover:bg-arc-blue/20 border border-arc-blue/20'
+            )}
+          >
+            {copied ? <Check size={13} /> : <Copy size={13} />}
+            {copied
+              ? (lang === 'nl' ? 'Gekopieerd!' : 'Copied!')
+              : (lang === 'nl' ? 'Kopiëren' : 'Copy')}
+          </button>
+        </div>
+      </div>
 
       {/* App info — admins only */}
       {isAdmin && (

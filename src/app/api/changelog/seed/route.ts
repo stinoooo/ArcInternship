@@ -229,6 +229,24 @@ const HISTORY = [
       'Version check active on all pages (including privacy, terms of use, and terms)',
     ],
   },
+  {
+    version: '4.7.0',
+    date: '2026-02-24',
+    nl: [
+      'E-mailadres wijzigen: gebruikers kunnen hun e-mailadres aanpassen in het profiel (wachtwoordbevestiging vereist)',
+      'Uitnodigingspagina (/invite): deel een link waarmee anderen een account kunnen aanvragen',
+      'Korte beschrijving van ArcInternship op de uitnodigingspagina met de belangrijkste functies',
+      'Beheerders en docenten kunnen de uitnodigingslink kopiëren vanuit de instellingen',
+      'TypeScript-compatibiliteitsfout in de changelog-modal opgelost',
+    ],
+    en: [
+      'Email address change: users can update their email address in their profile (password confirmation required)',
+      'Invite page (/invite): share a link so others can request an account',
+      'Short description of ArcInternship on the invite page with the key features',
+      'Admins and teachers can copy the invite link from the settings page',
+      'TypeScript compatibility error in the changelog modal fixed',
+    ],
+  },
 ]
 
 export async function POST(req: Request) {

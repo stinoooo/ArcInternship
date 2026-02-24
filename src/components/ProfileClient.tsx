@@ -22,6 +22,10 @@ export function ProfileClient({ user, lang }: Props) {
   const sessionUser = session?.user as { id?: string; role?: string }
   const isGuest = sessionUser?.role === 'guest'
 
+  // Email form
+  const [emailForm, setEmailForm] = useState({ currentPassword: '', newEmail: '', confirmEmail: '' })
+  const [emailSaving, setEmailSaving] = useState(false)
+
   // Password form
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [pwSaving, setPwSaving] = useState(false)
@@ -62,6 +66,33 @@ export function ProfileClient({ user, lang }: Props) {
       toast.error(t.avatarError)
     } finally {
       setAvatarUploading(false)
+    }
+  }
+
+  const handleEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!sessionUser?.id) return
+
+    setEmailSaving(true)
+    try {
+      const res = await fetch('/api/profile/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailForm),
+      })
+      if (res.ok) {
+        toast.success(t.emailChanged)
+        setEmailForm({ currentPassword: '', newEmail: '', confirmEmail: '' })
+        router.refresh()
+      } else {
+        const data = await res.json()
+        const errKey = data.error?.includes('in use') ? t.emailAlreadyInUse : (data.error || t.emailChangeError)
+        toast.error(errKey)
+      }
+    } catch {
+      toast.error(t.emailChangeError)
+    } finally {
+      setEmailSaving(false)
     }
   }
 
@@ -197,6 +228,64 @@ export function ProfileClient({ user, lang }: Props) {
         <p className="text-xs text-[var(--text-muted)] mt-3">
           {t.uploadAvatar} (JPG, PNG, WebP · max 2MB)
         </p>
+      </div>
+
+      {/* Change Email */}
+      <div className="card">
+        <h2 className="font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+          <Mail size={16} />
+          {t.changeEmail}
+        </h2>
+        <form onSubmit={handleEmailChange} className="space-y-3">
+          <div>
+            <label className="label">{t.newEmail}</label>
+            <input
+              type="email"
+              value={emailForm.newEmail}
+              onChange={e => setEmailForm(p => ({ ...p, newEmail: e.target.value }))}
+              className="input text-sm"
+              placeholder={user?.email}
+              autoComplete="email"
+              required
+            />
+          </div>
+          <div>
+            <label className="label">{t.confirmNewEmail}</label>
+            <input
+              type="email"
+              value={emailForm.confirmEmail}
+              onChange={e => setEmailForm(p => ({ ...p, confirmEmail: e.target.value }))}
+              className="input text-sm"
+              autoComplete="email"
+              required
+            />
+          </div>
+          <div>
+            <label className="label">{t.currentPassword}</label>
+            <input
+              type="password"
+              value={emailForm.currentPassword}
+              onChange={e => setEmailForm(p => ({ ...p, currentPassword: e.target.value }))}
+              className="input text-sm"
+              autoComplete="current-password"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={emailSaving}
+            className={cn(
+              'btn-secondary flex items-center gap-2',
+              emailSaving && 'opacity-50 cursor-not-allowed'
+            )}
+          >
+            {emailSaving
+              ? <div className="w-4 h-4 border-2 border-[var(--text-primary)] border-t-transparent rounded-full animate-spin" />
+              : <Mail size={14} />
+            }
+            {t.changeEmail}
+          </button>
+        </form>
       </div>
 
       {/* Internship details — hidden for guest accounts */}

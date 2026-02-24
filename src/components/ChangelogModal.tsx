@@ -34,7 +34,7 @@ function markRead(versions: string[]) {
   try {
     const existing = getReadVersions()
     versions.forEach(v => existing.add(v))
-    localStorage.setItem(READ_KEY, JSON.stringify([...existing]))
+    localStorage.setItem(READ_KEY, JSON.stringify(Array.from(existing)))
   } catch {}
 }
 
