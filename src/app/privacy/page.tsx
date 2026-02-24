@@ -1,7 +1,7 @@
 import { LegalLayout } from '@/components/layout/LegalLayout'
 
 export const metadata = {
-  title: 'Privacybeleid – ArcInternship',
+  title: 'ArcInternship – Privacy',
   description: 'Privacybeleid van ArcInternship conform de AVG (GDPR)',
 }
 

@@ -1,7 +1,7 @@
 import { LegalLayout } from '@/components/layout/LegalLayout'
 
 export const metadata = {
-  title: 'Servicevoorwaarden – ArcInternship',
+  title: 'ArcInternship – Terms',
   description: 'Algemene voorwaarden voor het gebruik van ArcInternship',
 }
 
