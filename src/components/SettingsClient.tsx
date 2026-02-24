@@ -3,9 +3,45 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, Link2, Copy } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, Link2, Copy, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
+
+function ConfirmModal({ title, description, confirmLabel, onConfirm, onCancel }: {
+  title: string
+  description: string
+  confirmLabel: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 w-9 h-9 rounded-full bg-arc-error/10 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle size={18} className="text-arc-error" />
+          </div>
+          <div>
+            <p className="font-semibold text-[var(--text-primary)]">{title}</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">{description}</p>
+          </div>
+        </div>
+        <div className="flex gap-2 justify-end">
+          <button onClick={onCancel} className="btn-secondary text-sm px-4 py-2">
+            Annuleren
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-xl bg-arc-error text-white text-sm font-medium hover:bg-arc-error/90 transition-colors"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 interface Props {
   users: IUser[]
@@ -34,6 +70,7 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [deleting, setDeleting] = useState<string | null>(null)
   const [approving, setApproving] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [confirmModal, setConfirmModal] = useState<{ title: string; description: string; confirmLabel: string; onConfirm: () => void } | null>(null)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -64,40 +101,54 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
     }
   }
 
-  const handleDeny = async (userId: string) => {
-    if (!confirm(lang === 'nl' ? 'Aanvraag weigeren en account verwijderen?' : 'Deny request and delete account?')) return
-    setDeleting(userId)
-    try {
-      const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
-      if (res.ok) {
-        setUsers(prev => prev.filter(u => u._id !== userId))
-        toast.success(lang === 'nl' ? 'Aanvraag geweigerd' : 'Request denied')
-      } else {
-        toast.error(t.error)
-      }
-    } catch {
-      toast.error(t.error)
-    } finally {
-      setDeleting(null)
-    }
+  const handleDeny = (userId: string) => {
+    setConfirmModal({
+      title: lang === 'nl' ? 'Aanvraag weigeren' : 'Deny request',
+      description: t.confirmDeny,
+      confirmLabel: lang === 'nl' ? 'Weigeren' : 'Deny',
+      onConfirm: async () => {
+        setConfirmModal(null)
+        setDeleting(userId)
+        try {
+          const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
+          if (res.ok) {
+            setUsers(prev => prev.filter(u => u._id !== userId))
+            toast.success(lang === 'nl' ? 'Aanvraag geweigerd' : 'Request denied')
+          } else {
+            toast.error(t.error)
+          }
+        } catch {
+          toast.error(t.error)
+        } finally {
+          setDeleting(null)
+        }
+      },
+    })
   }
 
-  const handleDelete = async (userId: string) => {
-    if (!confirm(t.confirmDelete)) return
-    setDeleting(userId)
-    try {
-      const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
-      if (res.ok) {
-        setUsers(prev => prev.filter(u => u._id !== userId))
-        toast.success(lang === 'nl' ? 'Gebruiker verwijderd' : 'User deleted')
-      } else {
-        toast.error(t.error)
-      }
-    } catch {
-      toast.error(t.error)
-    } finally {
-      setDeleting(null)
-    }
+  const handleDelete = (userId: string) => {
+    setConfirmModal({
+      title: t.deleteUser,
+      description: t.confirmDelete,
+      confirmLabel: lang === 'nl' ? 'Verwijderen' : 'Delete',
+      onConfirm: async () => {
+        setConfirmModal(null)
+        setDeleting(userId)
+        try {
+          const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' })
+          if (res.ok) {
+            setUsers(prev => prev.filter(u => u._id !== userId))
+            toast.success(lang === 'nl' ? 'Gebruiker verwijderd' : 'User deleted')
+          } else {
+            toast.error(t.error)
+          }
+        } catch {
+          toast.error(t.error)
+        } finally {
+          setDeleting(null)
+        }
+      },
+    })
   }
 
   const handleRoleChange = async (userId: string, role: UserRole) => {
@@ -324,6 +375,16 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
           </button>
         </div>
       </div>
+
+      {confirmModal && (
+        <ConfirmModal
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmLabel={confirmModal.confirmLabel}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
 
       {/* App info — admins only */}
       {isAdmin && (
