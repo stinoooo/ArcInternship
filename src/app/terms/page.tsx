@@ -1,8 +1,8 @@
 import { LegalLayout } from '@/components/layout/LegalLayout'
 
 export const metadata = {
-  title: 'Servicevoorwaarden – ArcStage',
-  description: 'Algemene voorwaarden voor het gebruik van ArcStage',
+  title: 'Servicevoorwaarden – ArcInternship',
+  description: 'Algemene voorwaarden voor het gebruik van ArcInternship',
 }
 
 export default function TermsPage() {
@@ -11,8 +11,8 @@ export default function TermsPage() {
       <div className="legal-box">
         <p>
           Deze servicevoorwaarden (ook wel: <em>algemene voorwaarden</em>) zijn van toepassing
-          op alle overeenkomsten tussen de exploitant van ArcStage en gebruikers van het platform.
-          Door een account aan te maken en gebruik te maken van ArcStage gaat u akkoord met
+          op alle overeenkomsten tussen de exploitant van ArcInternship en gebruikers van het platform.
+          Door een account aan te maken en gebruik te maken van ArcInternship gaat u akkoord met
           deze voorwaarden. Lees ze zorgvuldig.
         </p>
       </div>
@@ -21,11 +21,11 @@ export default function TermsPage() {
       <p>In deze servicevoorwaarden wordt verstaan onder:</p>
       <ul>
         <li>
-          <strong>Exploitant:</strong> de natuurlijke persoon of rechtspersoon die ArcStage
+          <strong>Exploitant:</strong> de natuurlijke persoon of rechtspersoon die ArcInternship
           beheert en aanbiedt, zoals vermeld in het privacybeleid onder artikel 1.
         </li>
         <li>
-          <strong>Platform / dienst:</strong> de webapplicatie ArcStage, toegankelijk via het
+          <strong>Platform / dienst:</strong> de webapplicatie ArcInternship, toegankelijk via het
           daartoe bestemde domein, inclusief alle bijbehorende API&apos;s en functionaliteiten.
         </li>
         <li>
@@ -53,7 +53,7 @@ export default function TermsPage() {
       <h2>Artikel 2 – Toepasselijkheid</h2>
       <p>
         Deze voorwaarden zijn van toepassing op alle overeenkomsten met betrekking tot het
-        gebruik van ArcStage. Afwijkende bedingen zijn slechts geldig indien schriftelijk
+        gebruik van ArcInternship. Afwijkende bedingen zijn slechts geldig indien schriftelijk
         overeengekomen. Eventuele algemene voorwaarden van de gebruiker worden uitdrukkelijk
         van de hand gewezen.
       </p>
@@ -67,7 +67,7 @@ export default function TermsPage() {
 
       <h2>Artikel 3 – Beschrijving van de dienst</h2>
       <p>
-        ArcStage is een webgebaseerd platform voor het registreren en beheren van stageuren
+        ArcInternship is een webgebaseerd platform voor het registreren en beheren van stageuren
         en stageactiviteiten. De dienst biedt onder meer de volgende functionaliteiten:
       </p>
       <ul>

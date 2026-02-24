@@ -1,8 +1,8 @@
 import { LegalLayout } from '@/components/layout/LegalLayout'
 
 export const metadata = {
-  title: 'Gebruiksvoorwaarden – ArcStage',
-  description: 'Regels voor het gebruik van het ArcStage platform',
+  title: 'Gebruiksvoorwaarden – ArcInternship',
+  description: 'Regels voor het gebruik van het ArcInternship platform',
 }
 
 export default function GebruikPage() {
@@ -11,7 +11,7 @@ export default function GebruikPage() {
       <div className="legal-box">
         <p>
           Deze gebruiksvoorwaarden beschrijven de regels en gedragsnormen die van toepassing
-          zijn op het gebruik van ArcStage. Zij vormen een aanvulling op de servicevoorwaarden
+          zijn op het gebruik van ArcInternship. Zij vormen een aanvulling op de servicevoorwaarden
           en het privacybeleid. Door gebruik te maken van het platform stemt u in met deze
           gebruiksvoorwaarden.
         </p>
@@ -19,7 +19,7 @@ export default function GebruikPage() {
 
       <h2>Artikel 1 – Doel van het platform</h2>
       <p>
-        ArcStage is uitsluitend bestemd voor het registreren, bijhouden en raadplegen van
+        ArcInternship is uitsluitend bestemd voor het registreren, bijhouden en raadplegen van
         stageuren en stageactiviteiten door studenten, docenten en beheerders in het kader
         van een erkende stageperiode. Ieder ander gebruik is niet toegestaan, tenzij de
         exploitant hiervoor voorafgaand schriftelijke toestemming heeft verleend.
@@ -57,7 +57,7 @@ export default function GebruikPage() {
 
       <h2>Artikel 3 – Verplichte juistheid van ingevoerde gegevens</h2>
       <p>
-        ArcStage dient als officieel registratiesysteem voor stageuren. De betrouwbaarheid
+        ArcInternship dient als officieel registratiesysteem voor stageuren. De betrouwbaarheid
         van de geregistreerde gegevens is essentieel.
       </p>
       <ul>
@@ -165,7 +165,7 @@ export default function GebruikPage() {
 
       <h2>Artikel 6 – Rollen en toegangsrechten</h2>
       <p>
-        ArcStage hanteert een rolgebaseerd systeem met de rollen <em>student</em>,
+        ArcInternship hanteert een rolgebaseerd systeem met de rollen <em>student</em>,
         <em> docent</em> en <em>beheerder</em>. Elke rol heeft specifieke bevoegdheden:
       </p>
       <ul>
@@ -235,7 +235,7 @@ export default function GebruikPage() {
       <h2>Artikel 10 – Verband met andere documenten</h2>
       <p>
         Deze gebruiksvoorwaarden dienen te worden gelezen in samenhang met de
-        servicevoorwaarden en het privacybeleid van ArcStage. Bij strijdigheid tussen
+        servicevoorwaarden en het privacybeleid van ArcInternship. Bij strijdigheid tussen
         deze documenten geldt de volgende rangorde:
       </p>
       <ol>

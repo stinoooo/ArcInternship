@@ -1,8 +1,8 @@
 import { LegalLayout } from '@/components/layout/LegalLayout'
 
 export const metadata = {
-  title: 'Privacybeleid – ArcStage',
-  description: 'Privacybeleid van ArcStage conform de AVG (GDPR)',
+  title: 'Privacybeleid – ArcInternship',
+  description: 'Privacybeleid van ArcInternship conform de AVG (GDPR)',
 }
 
 export default function PrivacyPage() {
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
       <div className="legal-box">
         <p>
           Dit privacybeleid is van toepassing op alle persoonsgegevens die worden verwerkt door
-          de beheerder van ArcStage in het kader van de dienstverlening. Lees dit document
+          de beheerder van ArcInternship in het kader van de dienstverlening. Lees dit document
           zorgvuldig. Bij vragen kunt u contact opnemen via het onderstaande e-mailadres.
         </p>
       </div>
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
 
       <h2>2. Welke persoonsgegevens verwerken wij?</h2>
       <p>
-        In het kader van de werking van het platform ArcStage worden de volgende
+        In het kader van de werking van het platform ArcInternship worden de volgende
         categorieën persoonsgegevens verwerkt:
       </p>
 
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>
-          <strong>Hostingprovider:</strong> de technische infrastructuur waarop ArcStage draait
+          <strong>Hostingprovider:</strong> de technische infrastructuur waarop ArcInternship draait
           wordt beheerd door een externe hostingprovider. Deze partij treedt op als
           verwerker in de zin van de AVG en verwerkt uw gegevens uitsluitend in opdracht van
           ons en op basis van een verwerkersovereenkomst die voldoet aan de eisen van artikel
@@ -236,14 +236,14 @@ export default function PrivacyPage() {
 
       <h2>9. Geautomatiseerde besluitvorming</h2>
       <p>
-        ArcStage past geen geautomatiseerde besluitvorming of profilering toe als bedoeld
+        ArcInternship past geen geautomatiseerde besluitvorming of profilering toe als bedoeld
         in artikel 22 van de AVG. Alle beoordelingen van stagegegevens worden door
         mensen (begeleiders of beheerders) uitgevoerd.
       </p>
 
       <h2>10. Cookies</h2>
       <p>
-        ArcStage maakt gebruik van een functionele sessiecookie (HttpOnly, Secure) die
+        ArcInternship maakt gebruik van een functionele sessiecookie (HttpOnly, Secure) die
         noodzakelijk is voor authenticatie en het bijhouden van uw inlogsessie. Deze cookie
         bevat een JWT-token en is strikt functioneel; er worden geen tracking- of
         analysecookies geplaatst.

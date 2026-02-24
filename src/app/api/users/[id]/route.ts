@@ -120,7 +120,7 @@ export async function PATCH(
       try {
         await seedDaysForUser(params.id, user.startDate, user.endDate)
       } catch (e) {
-        console.error('[ArcStage] seedDaysForUser failed (non-fatal):', e)
+        console.error('[ArcInternship] seedDaysForUser failed (non-fatal):', e)
       }
     }
 
