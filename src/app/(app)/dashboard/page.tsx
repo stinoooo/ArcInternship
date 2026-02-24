@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth'
-import { authOptions, canViewAllUsers } from '@/lib/auth'
+import { authOptions } from '@/lib/auth'
 import { connectToDatabase } from '@/lib/mongodb'
 import Day from '@/lib/models/Day'
 import User from '@/lib/models/User'
@@ -9,20 +9,14 @@ import { IDay, IUser } from '@/types'
 
 const DEFAULT_TARGET_HOURS = 760
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { student?: string }
-}) {
+export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   const sessionUser = session?.user as { id?: string; role?: string }
-  const role = sessionUser?.role ?? 'guest'
   const sessionUserId = sessionUser?.id ?? ''
-  const isTeacherOrAdmin = canViewAllUsers(role)
 
   await connectToDatabase()
 
-  // Resolve language from DB
+  // Language: DB is authoritative, cookie is fallback
   let lang = 'nl'
   try {
     const dbUser = sessionUserId ? await User.findById(sessionUserId) : null
@@ -39,42 +33,28 @@ export default async function DashboardPage({
     if (cookieLang && ['nl', 'en'].includes(cookieLang)) lang = cookieLang
   }
 
-  // Determine which student's data to show
-  let students: IUser[] = []
-  let targetUserId = sessionUserId
+  // Load current user's profile (for requiredHours, name, etc.)
   let targetStudent: IUser | null = null
-
-  if (isTeacherOrAdmin) {
-    const rawStudents = await User.find(
-      { approved: true, role: { $in: ['student', 'guest'] } },
-      '-password'
-    ).sort({ username: 1 }).lean()
-    students = rawStudents as unknown as IUser[]
-
-    if (searchParams?.student && students.some(s => s._id.toString() === searchParams.student)) {
-      targetUserId = searchParams.student!
-    } else if (students.length > 0) {
-      // Default to first student
-      targetUserId = students[0]._id.toString()
-    }
-
-    targetStudent = students.find(s => s._id.toString() === targetUserId) ?? null
-  } else {
-    // Students view their own data; load their own profile for requiredHours etc.
-    const self = await User.findById(sessionUserId, '-password').lean()
+  try {
+    const self = sessionUserId ? await User.findById(sessionUserId, '-password').lean() : null
     targetStudent = self as unknown as IUser | null
-  }
+  } catch (_e) { /* ignore */ }
 
   const targetHours = targetStudent?.requiredHours ?? DEFAULT_TARGET_HOURS
 
-  // Load this student's days
-  const days = await Day.find({ userId: targetUserId }).sort({ date: 1 }).lean() as unknown as IDay[]
+  // Load current user's own days
+  let days: IDay[] = []
+  try {
+    if (sessionUserId) {
+      days = (await Day.find({ userId: sessionUserId }).sort({ date: 1 }).lean()) as unknown as IDay[]
+    }
+  } catch (_e) { /* ignore */ }
 
   const noHoursTypes = ['vrij', 'ziek', 'feestdag']
   const completedDays = days.filter(d => d.isComplete)
   const completedHours = completedDays.reduce(
     (sum, d) => sum + (noHoursTypes.includes(d.type) ? 0 : d.hours),
-    0
+    0,
   )
   const remainingHours = Math.max(0, targetHours - completedHours)
   const percentage = Math.min(100, Math.round((completedHours / targetHours) * 100))
@@ -83,9 +63,8 @@ export default async function DashboardPage({
 
   const weekMap = new Map<number, IDay[]>()
   days.forEach(day => {
-    const key = day.weekNumber
-    if (!weekMap.has(key)) weekMap.set(key, [])
-    weekMap.get(key)!.push(day)
+    if (!weekMap.has(day.weekNumber)) weekMap.set(day.weekNumber, [])
+    weekMap.get(day.weekNumber)!.push(day)
   })
 
   const weeks = Array.from(weekMap.entries()).map(([weekNumber, weekDays]) => ({
@@ -94,7 +73,7 @@ export default async function DashboardPage({
     days: weekDays,
     totalHours: weekDays.filter(d => d.isComplete).reduce(
       (sum, d) => sum + (noHoursTypes.includes(d.type) ? 0 : d.hours),
-      0
+      0,
     ),
     completedDays: weekDays.filter(d => d.isComplete).length,
   }))
@@ -115,10 +94,10 @@ export default async function DashboardPage({
       stats={stats}
       days={days}
       lang={lang}
-      students={students}
-      selectedStudentId={targetUserId}
+      students={[]}
+      selectedStudentId={sessionUserId}
       selectedStudent={targetStudent}
-      isTeacherOrAdmin={isTeacherOrAdmin}
+      isTeacherOrAdmin={false}
     />
   )
 }
