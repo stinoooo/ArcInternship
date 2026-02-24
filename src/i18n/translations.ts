@@ -159,6 +159,15 @@ export const translations = {
     updateNow: 'Nu vernieuwen',
     updateSeconds: 'seconden',
     unsavedRestored: 'Niet-opgeslagen wijzigingen hersteld',
+    versionUpToDate: 'Up-to-date',
+    versionUpdateAvailableFooter: 'Nieuwe versie beschikbaar',
+
+    // Changelog
+    changelogTitle: 'Versiegeschiedenis',
+    changelogNew: 'nieuw',
+    changelogEmpty: 'Geen changelog-items gevonden.',
+    whatsNew: 'Wat is er nieuw?',
+    changelogButton: 'Changelog',
 
     // Footer
     footerText: 'Part of the ArcNode Network & Stinoo Network',
@@ -323,6 +332,15 @@ export const translations = {
     updateNow: 'Refresh now',
     updateSeconds: 'seconds',
     unsavedRestored: 'Unsaved changes restored',
+    versionUpToDate: 'Up-to-date',
+    versionUpdateAvailableFooter: 'New version available',
+
+    // Changelog
+    changelogTitle: 'Version History',
+    changelogNew: 'new',
+    changelogEmpty: 'No changelog entries found.',
+    whatsNew: "What's New?",
+    changelogButton: 'Changelog',
 
     // Footer
     footerText: 'Part of the ArcNode Network & Stinoo Network',

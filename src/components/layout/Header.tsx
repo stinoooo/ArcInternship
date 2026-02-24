@@ -21,10 +21,10 @@ export function Header({ lang, session }: HeaderProps) {
   const router = useRouter()
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
-  // Dynamically update document title based on language
+  // Tab title is always the app name — language-independent
   useEffect(() => {
-    document.title = `${t.app} – ${t.appSubtitle}`
-  }, [t.app, t.appSubtitle])
+    document.title = 'ArcInternship'
+  }, [])
 
   const toggleLanguage = async () => {
     const newLang = lang === 'nl' ? 'en' : 'nl'

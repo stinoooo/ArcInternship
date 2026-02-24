@@ -1,32 +1,101 @@
+# .github/labeler.yml — actions/labeler@v5 format
+# Labels are applied when ANY of the configured file globs match a changed file in the PR.
+
+# ── Authentication & Security ───────────────────────────────────────────────────
 authentication:
-  - src/lib/auth.ts
-  - src/app/api/auth/**
-  - src/app/login/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/lib/auth.ts'
+      - 'src/lib/rateLimit.ts'
+      - 'src/middleware.ts'
+      - 'src/app/api/auth/**'
+      - 'src/app/login/**'
+      - 'src/app/register/**'
 
+# ── API routes ──────────────────────────────────────────────────────────────────
 api:
-  - src/app/api/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/app/api/**'
 
+# ── UI / Frontend components ────────────────────────────────────────────────────
 ui:
-  - src/components/**
-  - src/app/**/page.tsx
-  - src/app/**/layout.tsx
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/components/**'
+      - 'src/app/**/page.tsx'
+      - 'src/app/**/layout.tsx'
+      - 'src/app/globals.css'
 
+# ── Database models ──────────────────────────────────────────────────────────────
+database:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/lib/models/**'
+      - 'src/lib/mongodb.ts'
+      - 'src/lib/seedDays.ts'
+
+# ── Internationalisation ─────────────────────────────────────────────────────────
 i18n:
-  - src/i18n/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/i18n/**'
 
+# ── Legal pages ──────────────────────────────────────────────────────────────────
 legal:
-  - src/app/privacy/**
-  - src/app/terms/**
-  - src/app/use/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/app/privacy/**'
+      - 'src/app/terms/**'
+      - 'src/app/use/**'
 
+# ── Versioning & Changelog ───────────────────────────────────────────────────────
+versioning:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'public/version.json'
+      - 'scripts/generate-version.js'
+      - 'src/app/api/version/**'
+      - 'src/app/api/changelog/**'
+      - 'src/components/VersionUpdateBanner.tsx'
+      - 'src/components/ChangelogModal.tsx'
+
+# ── Configuration ─────────────────────────────────────────────────────────────────
 config:
-  - next.config.js
-  - tailwind.config.*
-  - tsconfig.json
-  - postcss.config.*
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'next.config.js'
+      - 'next.config.ts'
+      - 'tailwind.config.*'
+      - 'tsconfig.json'
+      - 'postcss.config.*'
+      - '.eslintrc*'
+      - '.prettierrc*'
 
+# ── CI / GitHub Actions ───────────────────────────────────────────────────────────
 ci:
-  - .github/**
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
 
+# ── Dependencies ──────────────────────────────────────────────────────────────────
 dependencies:
-  - package.json
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
+
+# ── Tooling & Scripts ─────────────────────────────────────────────────────────────
+tooling:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'scripts/**'
+
+# ── Types ─────────────────────────────────────────────────────────────────────────
+types:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/types/**'
+      - 'src/types/index.ts'
