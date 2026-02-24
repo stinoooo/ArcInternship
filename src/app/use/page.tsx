@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function UsePage() {
   return (
-    <LegalLayout title="Gebruiksvoorwaarden" lastUpdated="23 februari 2026">
+    <LegalLayout title="Gebruiksvoorwaarden" lastUpdated="24 februari 2026">
       <div className="legal-box">
         <p>
           Deze gebruiksvoorwaarden beschrijven de regels en gedragsnormen die van toepassing
