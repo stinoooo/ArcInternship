@@ -280,4 +280,14 @@ export const CHANGELOG_HISTORY = [
       'Users can delete their own account from the profile page (removes all data)',
     ],
   },
+  {
+    version: '5.9.3',
+    date: '2026-02-24',
+    nl: [
+      '"Account verwijderen" card verplaatst naar onder de stagegegevens op de profielpagina',
+    ],
+    en: [
+      'Moved "Delete account" card to below internship details on the profile page',
+    ],
+  },
 ]
