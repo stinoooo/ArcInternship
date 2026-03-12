@@ -344,4 +344,14 @@ export const CHANGELOG_HISTORY = [
       'Resync logic now validates both the date and the day-of-week before considering a record correct',
     ],
   },
+  {
+    version: '5.9.9',
+    date: '2026-03-12',
+    nl: [
+      'Bugfix: "Herstel dagrecords" sloeg admin-accounts over omdat die de onboarding overslaan — de resync werkt nu voor alle gebruikers met een startdatum en einddatum',
+    ],
+    en: [
+      'Bugfix: "Repair day records" was skipping admin accounts because they bypass onboarding — resync now runs for all users with a start and end date',
+    ],
+  },
 ]

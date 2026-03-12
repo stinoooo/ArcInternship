@@ -15,7 +15,6 @@ export async function POST() {
   await connectToDatabase()
 
   const users = await User.find({
-    onboardingCompleted: true,
     startDate: { $exists: true, $ne: '' },
     endDate:   { $exists: true, $ne: '' },
   }).lean()

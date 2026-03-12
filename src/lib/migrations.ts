@@ -67,7 +67,6 @@ export async function resyncDaysForUser(userId: string, startDate: string, endDa
 
 async function resyncDayDates() {
   const users = await User.find({
-    onboardingCompleted: true,
     startDate: { $exists: true, $ne: '' },
     endDate:   { $exists: true, $ne: '' },
   }).lean()
