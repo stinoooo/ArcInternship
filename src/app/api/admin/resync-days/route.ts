@@ -25,8 +25,10 @@ export async function POST(req: NextRequest) {
   let totalDeleted = 0, totalInserted = 0, totalFailed = 0, errors = 0, processed = 0
 
   for (const user of users) {
-    const startDate = (user.startDate && user.startDate !== '') ? user.startDate : overrideStart
-    const endDate   = (user.endDate   && user.endDate   !== '') ? user.endDate   : overrideEnd
+    // Override dates (entered by admin) take priority over stored dates.
+    // Fall back to stored dates only when no override was provided.
+    const startDate = overrideStart || user.startDate || ''
+    const endDate   = overrideEnd   || user.endDate   || ''
 
     // Skip users with no usable date range
     if (!startDate || !endDate) continue
