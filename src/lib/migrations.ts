@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import Migration from './models/Migration'
 import Day from './models/Day'
 import User from './models/User'
@@ -23,20 +24,44 @@ export async function resyncDaysForUser(userId: string, startDate: string, endDa
 
   const correctDays = generateWorkingDays(start, end)
 
-  // Wipe every existing record for this user, then insert fresh ones.
-  // Using a hard reset avoids all edge-cases from previous partial migrations
-  // (wrong dayOfWeek, duplicate keys, silent insert failures, etc.).
-  const deleteResult = await Day.deleteMany({ userId })
+  // Wipe every existing record for this user.
+  // Use $or to catch records stored with userId as either ObjectId or plain string
+  // (older partial migrations may have stored the wrong type).
+  let objectIdUserId: Types.ObjectId | null = null
+  try { objectIdUserId = new Types.ObjectId(userId) } catch { /* not a valid ObjectId */ }
+
+  const userIdFilter = objectIdUserId
+    ? { $or: [{ userId: objectIdUserId }, { userId: userId }] }
+    : { userId }
+
+  const deleteResult = await Day.deleteMany(userIdFilter)
   const deleted = deleteResult.deletedCount ?? 0
 
+  // Upsert each day individually so a single conflict cannot block the rest.
+  // This handles any leftover documents with mismatched userId types.
   const toInsert = correctDays.map(d => ({ ...d, userId }))
   let inserted = 0
-  if (toInsert.length > 0) {
-    const result = await Day.insertMany(toInsert, { ordered: false })
-    inserted = result.length
+  const failedDates: string[] = []
+
+  for (const doc of toInsert) {
+    try {
+      await Day.findOneAndUpdate(
+        { date: doc.date, userId: doc.userId },
+        { $set: doc },
+        { upsert: true, new: true },
+      )
+      inserted++
+    } catch (err) {
+      failedDates.push(doc.date)
+      console.error(`[resync] failed to upsert ${doc.date} for user ${userId}:`, err)
+    }
   }
 
-  return { deleted, inserted }
+  if (failedDates.length > 0) {
+    console.error(`[resync] ${failedDates.length} failed dates for user ${userId}:`, failedDates)
+  }
+
+  return { deleted, inserted, failed: failedDates.length }
 }
 
 async function resyncDayDates_v3() {

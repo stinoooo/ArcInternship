@@ -1,6 +1,6 @@
 {
   "name": "arcinternship",
-  "version": "5.9.11",
+  "version": "5.9.12",
   "private": true,
   "scripts": {
     "dev": "next dev",
