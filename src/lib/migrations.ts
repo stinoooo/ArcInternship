@@ -74,7 +74,7 @@ async function resyncDayDates() {
     }
 
     // Insert any remaining correct dates that still have no record
-    const toInsert = [...stillMissing.values()].map(d => ({ ...d, userId: user._id }))
+    const toInsert = Array.from(stillMissing.values()).map(d => ({ ...d, userId: user._id }))
     if (toInsert.length > 0) {
       try {
         await Day.insertMany(toInsert, { ordered: false })
