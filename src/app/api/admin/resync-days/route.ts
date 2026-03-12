@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   // All users — those without stored dates will use the override if provided
   const users = await User.find({}).lean()
 
-  let totalDeleted = 0, totalInserted = 0, errors = 0, processed = 0
+  let totalDeleted = 0, totalInserted = 0, totalFailed = 0, errors = 0, processed = 0
 
   for (const user of users) {
     const startDate = (user.startDate && user.startDate !== '') ? user.startDate : overrideStart
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       const result = await resyncDaysForUser(String(user._id), startDate, endDate)
       totalDeleted  += result.deleted
       totalInserted += result.inserted
+      totalFailed   += result.failed ?? 0
     } catch {
       errors++
     }
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
     users: processed,
     deleted: totalDeleted,
     inserted: totalInserted,
+    failed: totalFailed,
     errors,
   })
 }

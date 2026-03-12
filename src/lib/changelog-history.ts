@@ -378,4 +378,16 @@ export const CHANGELOG_HISTORY = [
       'Admin repair button now works for accounts that skipped onboarding and have no start date stored',
     ],
   },
+  {
+    version: '5.9.12',
+    date: '2026-03-12',
+    nl: [
+      'Dagrecords herstel: vrijdag werd soms niet aangemaakt door een stille fout bij meerdere inserts tegelijk — elke dag wordt nu individueel opgeslagen zodat één mislukte dag de rest niet blokkeert',
+      'Herstel verwijdert nu ook records waarbij de gebruikers-ID in een oud formaat was opgeslagen (string i.p.v. ObjectId)',
+    ],
+    en: [
+      'Day records repair: Friday was sometimes skipped due to a silent error in bulk inserts — each day is now upserted individually so one failure cannot block the rest',
+      'Repair now also removes records where the user ID was stored in a legacy format (string instead of ObjectId)',
+    ],
+  },
 ]
