@@ -320,4 +320,16 @@ export const CHANGELOG_HISTORY = [
       'Bugfix: first migration caused conflicts due to the unique date index — replaced with a smarter resync migration that moves records to the correct date while preserving filled-in data',
     ],
   },
+  {
+    version: '5.9.7',
+    date: '2026-03-12',
+    nl: [
+      'Admin knop "Herstel dagrecords" toegevoegd in instellingen om dagrecords handmatig te corrigeren',
+      'Migratie verbeterd: fouten per gebruiker worden nu afzonderlijk afgehandeld zodat de rest gewoon doorgaat',
+    ],
+    en: [
+      'Added admin "Repair day records" button in settings to manually correct day records',
+      'Improved migration: errors per user are now handled individually so the rest continues normally',
+    ],
+  },
 ]

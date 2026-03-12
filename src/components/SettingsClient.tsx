@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { IUser, UserRole } from '@/types'
 import { translations } from '@/i18n/translations'
-import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, Link2, Copy, AlertTriangle } from 'lucide-react'
+import { Trash2, Shield, User, Check, X, BookOpen, GraduationCap, Link2, Copy, AlertTriangle, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -71,6 +71,8 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [approving, setApproving] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [confirmModal, setConfirmModal] = useState<{ title: string; description: string; confirmLabel: string; onConfirm: () => void } | null>(null)
+  const [resyncingDays, setResyncingDays] = useState(false)
+  const [resyncResult, setResyncResult] = useState<string | null>(null)
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -149,6 +151,28 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
         }
       },
     })
+  }
+
+  const handleResyncDays = async () => {
+    setResyncingDays(true)
+    setResyncResult(null)
+    try {
+      const res = await fetch('/api/admin/resync-days', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setResyncResult(
+          lang === 'nl'
+            ? `Klaar — ${data.users} gebruikers, ${data.moved} verplaatst, ${data.inserted} aangemaakt, ${data.deleted} verwijderd`
+            : `Done — ${data.users} users, ${data.moved} moved, ${data.inserted} created, ${data.deleted} deleted`
+        )
+      } else {
+        toast.error(data.error || t.error)
+      }
+    } catch {
+      toast.error(t.error)
+    } finally {
+      setResyncingDays(false)
+    }
   }
 
   const handleRoleChange = async (userId: string, role: UserRole) => {
@@ -405,6 +429,26 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
                 <span className="text-sm font-medium text-[var(--text-primary)]">{value}</span>
               </div>
             ))}
+          </div>
+          <div className="mt-4 pt-4 border-t border-[var(--border)]">
+            <p className="text-sm text-[var(--text-muted)] mb-2">
+              {lang === 'nl' ? 'Dagrecords herstel' : 'Day records repair'}
+            </p>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                onClick={handleResyncDays}
+                disabled={resyncingDays}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-arc-blue/10 text-arc-blue hover:bg-arc-blue/20 border border-arc-blue/20 text-xs font-medium transition-colors disabled:opacity-50"
+              >
+                {resyncingDays
+                  ? <div className="w-3.5 h-3.5 border-2 border-arc-blue border-t-transparent rounded-full animate-spin" />
+                  : <RefreshCw size={13} />}
+                {lang === 'nl' ? 'Herstel dagrecords' : 'Repair day records'}
+              </button>
+              {resyncResult && (
+                <span className="text-xs text-arc-success">{resyncResult}</span>
+              )}
+            </div>
           </div>
         </div>
       )}
