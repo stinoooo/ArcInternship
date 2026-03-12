@@ -62,7 +62,10 @@ export function generateWorkingDays(startDate: Date, endDate: Date) {
     const dayOfWeek = current.getDay()
     // Only Monday-Friday (1-5)
     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      const dateStr = current.toISOString().split('T')[0]
+      const year = current.getFullYear()
+      const month = String(current.getMonth() + 1).padStart(2, '0')
+      const day = String(current.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}`
       days.push({
         date: dateStr,
         dayOfWeek,

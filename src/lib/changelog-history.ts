@@ -290,4 +290,14 @@ export const CHANGELOG_HISTORY = [
       'Moved "Delete account" card to below internship details on the profile page',
     ],
   },
+  {
+    version: '5.9.4',
+    date: '2026-03-12',
+    nl: [
+      'Bugfix: stagdagen werden door een tijdzone-fout één dag te vroeg opgeslagen (bijv. maandag 2 maart werd opgeslagen als zondag 1 maart)',
+    ],
+    en: [
+      'Bugfix: internship days were saved one day too early due to a timezone offset bug (e.g. Monday 2 March was stored as Sunday 1 March)',
+    ],
+  },
 ]
