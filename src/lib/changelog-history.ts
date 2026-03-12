@@ -354,4 +354,16 @@ export const CHANGELOG_HISTORY = [
       'Bugfix: "Repair day records" was skipping admin accounts because they bypass onboarding — resync now runs for all users with a start and end date',
     ],
   },
+  {
+    version: '5.9.10',
+    date: '2026-03-12',
+    nl: [
+      'Dagrecord herstel vervangen door een betrouwbare reset: alle dagrecords worden gewist en opnieuw aangemaakt met correcte datums en dag-van-de-week waarden',
+      'Automatische migratie bij opstart herstelt nu ook alle gebruikers inclusief admins',
+    ],
+    en: [
+      'Day record repair replaced with a reliable reset: all day records are wiped and re-created with correct dates and day-of-week values',
+      'Startup migration now also covers all users including admins',
+    ],
+  },
 ]

@@ -6,66 +6,40 @@ import { generateWorkingDays } from './utils'
 /** superseded — kept so the DB entry is never re-used */
 async function fixDayDateOffset() {}
 
+/** superseded — kept so the DB entry is never re-used */
+async function resyncDayDates() {}
+
 /**
- * Core resync for a single user.
+ * Hard reset for a single user: delete ALL their Day records and
+ * re-insert every weekday in their internship period with default values.
  *
- * A record is considered CORRECT only when BOTH its date AND its dayOfWeek
- * match the expected values from generateWorkingDays. Everything else is
- * deleted and re-inserted with defaults.
- *
- * Records that are fully correct (right date + right dayOfWeek) are
- * preserved — including any user-entered hours/activities.
+ * Any previously entered hours / activities will be lost, but this
+ * guarantees the date and dayOfWeek values are always correct.
  */
 export async function resyncDaysForUser(userId: string, startDate: string, endDate: string) {
   const start = new Date(startDate + 'T12:00:00')
   const end   = new Date(endDate   + 'T12:00:00')
   if (isNaN(start.getTime()) || isNaN(end.getTime())) return { deleted: 0, inserted: 0 }
 
-  const correctDays   = generateWorkingDays(start, end)
-  const correctByDate = new Map(correctDays.map(d => [d.date, d]))
+  const correctDays = generateWorkingDays(start, end)
 
-  const existing = await Day.find({ userId }).lean()
+  // Wipe every existing record for this user, then insert fresh ones.
+  // Using a hard reset avoids all edge-cases from previous partial migrations
+  // (wrong dayOfWeek, duplicate keys, silent insert failures, etc.).
+  const deleteResult = await Day.deleteMany({ userId })
+  const deleted = deleteResult.deletedCount ?? 0
 
-  // Only records where both date AND dayOfWeek are correct are kept
-  const fullyCorrect = new Set(
-    existing
-      .filter(r => {
-        const exp = correctByDate.get(r.date)
-        return exp && exp.dayOfWeek === r.dayOfWeek
-      })
-      .map(r => r.date)
-  )
-
-  // Delete everything that is not fully correct
-  const toDeleteIds = existing
-    .filter(r => !fullyCorrect.has(r.date))
-    .map(r => r._id)
-
-  let deleted = 0
-  if (toDeleteIds.length > 0) {
-    await Day.deleteMany({ _id: { $in: toDeleteIds } })
-    deleted = toDeleteIds.length
-  }
-
-  // Insert all correct dates that are still missing
-  const toInsert = correctDays
-    .filter(d => !fullyCorrect.has(d.date))
-    .map(d => ({ ...d, userId }))
-
+  const toInsert = correctDays.map(d => ({ ...d, userId }))
   let inserted = 0
   if (toInsert.length > 0) {
-    try {
-      await Day.insertMany(toInsert, { ordered: false })
-      inserted = toInsert.length
-    } catch {
-      // Ignore duplicate-key errors from concurrent inserts
-    }
+    const result = await Day.insertMany(toInsert, { ordered: false })
+    inserted = result.length
   }
 
   return { deleted, inserted }
 }
 
-async function resyncDayDates() {
+async function resyncDayDates_v3() {
   const users = await User.find({
     startDate: { $exists: true, $ne: '' },
     endDate:   { $exists: true, $ne: '' },
@@ -80,16 +54,17 @@ async function resyncDayDates() {
       totalDeleted  += r.deleted
       totalInserted += r.inserted
     } catch (err) {
-      console.error(`[migration] resyncDayDates: error for user ${user._id}:`, err)
+      console.error(`[migration] resyncDayDates_v3: error for user ${user._id}:`, err)
     }
   }
 
-  console.log(`[migration] resyncDayDates: deleted=${totalDeleted} inserted=${totalInserted}`)
+  console.log(`[migration] resyncDayDates_v3: deleted=${totalDeleted} inserted=${totalInserted}`)
 }
 
 const MIGRATIONS: { name: string; run: () => Promise<void> }[] = [
-  { name: 'fixDayDateOffset', run: fixDayDateOffset },
-  { name: 'resyncDayDates',   run: resyncDayDates   },
+  { name: 'fixDayDateOffset',  run: fixDayDateOffset  },
+  { name: 'resyncDayDates',    run: resyncDayDates     },
+  { name: 'resyncDayDates_v3', run: resyncDayDates_v3  },
 ]
 
 export async function runMigrations() {
