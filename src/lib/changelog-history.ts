@@ -300,4 +300,14 @@ export const CHANGELOG_HISTORY = [
       'Bugfix: internship days were saved one day too early due to a timezone offset bug (e.g. Monday 2 March was stored as Sunday 1 March)',
     ],
   },
+  {
+    version: '5.9.5',
+    date: '2026-03-12',
+    nl: [
+      'Automatische migratie toegevoegd: bestaande dagrecords met een verkeerde datum (door de tijdzone-bug) worden bij de eerste opstart automatisch gecorrigeerd',
+    ],
+    en: [
+      'Added automatic migration: existing day records with an incorrect date (caused by the timezone bug) are automatically corrected on first startup',
+    ],
+  },
 ]

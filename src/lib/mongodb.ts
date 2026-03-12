@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { runMigrations } from './migrations'
 
 interface GlobalMongoose {
   conn: typeof mongoose | null
@@ -33,5 +34,7 @@ export async function connectToDatabase() {
   }
 
   cached.conn = await cached.promise
+  // Run pending migrations once per process lifetime (after first connection)
+  runMigrations()
   return cached.conn
 }
