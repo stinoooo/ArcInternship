@@ -310,4 +310,14 @@ export const CHANGELOG_HISTORY = [
       'Added automatic migration: existing day records with an incorrect date (caused by the timezone bug) are automatically corrected on first startup',
     ],
   },
+  {
+    version: '5.9.6',
+    date: '2026-03-12',
+    nl: [
+      'Bugfix: eerste migratie veroorzaakte conflicten door de unieke index op datum — vervangen door een slimmere resync-migratie die records op de juiste datum zet (met behoud van ingevulde data)',
+    ],
+    en: [
+      'Bugfix: first migration caused conflicts due to the unique date index — replaced with a smarter resync migration that moves records to the correct date while preserving filled-in data',
+    ],
+  },
 ]
