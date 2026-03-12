@@ -390,4 +390,14 @@ export const CHANGELOG_HISTORY = [
       'Repair now also removes records where the user ID was stored in a legacy format (string instead of ObjectId)',
     ],
   },
+  {
+    version: '5.9.13',
+    date: '2026-03-12',
+    nl: [
+      'Dagrecords herstel: datuminvoer in het adminpaneel heeft nu altijd voorrang op de opgeslagen stageperiode — een verkeerd opgeslagen einddatum kon er eerder voor zorgen dat de vrijdag nooit werd aangemaakt',
+    ],
+    en: [
+      'Day records repair: override dates entered in the admin panel now always take priority over stored internship dates — a wrongly saved end date could previously prevent Friday from ever being generated',
+    ],
+  },
 ]
