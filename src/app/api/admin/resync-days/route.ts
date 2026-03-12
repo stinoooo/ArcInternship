@@ -20,13 +20,12 @@ export async function POST() {
     endDate:   { $exists: true, $ne: '' },
   }).lean()
 
-  let totalMoved = 0, totalDeleted = 0, totalInserted = 0, errors = 0
+  let totalDeleted = 0, totalInserted = 0, errors = 0
 
   for (const user of users) {
     if (!user.startDate || !user.endDate) continue
     try {
       const result = await resyncDaysForUser(String(user._id), user.startDate, user.endDate)
-      totalMoved    += result.moved
       totalDeleted  += result.deleted
       totalInserted += result.inserted
     } catch {
@@ -36,7 +35,6 @@ export async function POST() {
 
   return NextResponse.json({
     users: users.length,
-    moved: totalMoved,
     deleted: totalDeleted,
     inserted: totalInserted,
     errors,

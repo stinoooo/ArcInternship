@@ -332,4 +332,16 @@ export const CHANGELOG_HISTORY = [
       'Improved migration: errors per user are now handled individually so the rest continues normally',
     ],
   },
+  {
+    version: '5.9.8',
+    date: '2026-03-12',
+    nl: [
+      'Bugfix: dagrecords met een verkeerde dag-van-de-week (bijv. maandag opgeslagen als dag 2 in plaats van dag 1) worden nu correct herkend en hersteld',
+      'Resync-logica controleert nu zowel de datum als de dag-van-de-week voordat een record als correct wordt beschouwd',
+    ],
+    en: [
+      'Bugfix: day records with an incorrect day-of-week value (e.g. Monday stored as day 2 instead of day 1) are now correctly detected and repaired',
+      'Resync logic now validates both the date and the day-of-week before considering a record correct',
+    ],
+  },
 ]
