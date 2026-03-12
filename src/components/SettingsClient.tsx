@@ -162,8 +162,8 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
       if (res.ok) {
         setResyncResult(
           lang === 'nl'
-            ? `Klaar — ${data.users} gebruikers, ${data.moved} verplaatst, ${data.inserted} aangemaakt, ${data.deleted} verwijderd`
-            : `Done — ${data.users} users, ${data.moved} moved, ${data.inserted} created, ${data.deleted} deleted`
+            ? `Klaar — ${data.users} gebruikers, ${data.inserted} aangemaakt, ${data.deleted} verwijderd`
+            : `Done — ${data.users} users, ${data.inserted} created, ${data.deleted} deleted`
         )
       } else {
         toast.error(data.error || t.error)
