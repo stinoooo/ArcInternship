@@ -366,4 +366,16 @@ export const CHANGELOG_HISTORY = [
       'Startup migration now also covers all users including admins',
     ],
   },
+  {
+    version: '5.9.11',
+    date: '2026-03-12',
+    nl: [
+      'Dagrecords herstel: datuminvoer toegevoegd zodat de admin de stageperiode zelf kan opgeven (fallback voor accounts zonder opgeslagen datums)',
+      'Admin-knop herstel werkt nu ook voor accounts die de onboarding hebben overgeslagen en nog geen startdatum hebben',
+    ],
+    en: [
+      'Day records repair: date inputs added so the admin can specify the internship period directly (fallback for accounts with no saved dates)',
+      'Admin repair button now works for accounts that skipped onboarding and have no start date stored',
+    ],
+  },
 ]

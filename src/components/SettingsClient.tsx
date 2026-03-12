@@ -73,6 +73,8 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
   const [confirmModal, setConfirmModal] = useState<{ title: string; description: string; confirmLabel: string; onConfirm: () => void } | null>(null)
   const [resyncingDays, setResyncingDays] = useState(false)
   const [resyncResult, setResyncResult] = useState<string | null>(null)
+  const [resyncStart, setResyncStart] = useState('2026-02-09')
+  const [resyncEnd,   setResyncEnd]   = useState('2026-07-10')
 
   const t = translations[lang as 'nl' | 'en'] || translations.nl
 
@@ -157,7 +159,11 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
     setResyncingDays(true)
     setResyncResult(null)
     try {
-      const res = await fetch('/api/admin/resync-days', { method: 'POST' })
+      const res = await fetch('/api/admin/resync-days', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: resyncStart, endDate: resyncEnd }),
+      })
       const data = await res.json()
       if (res.ok) {
         setResyncResult(
@@ -434,10 +440,30 @@ export function SettingsClient({ users: initialUsers, lang, currentUserId, curre
             <p className="text-sm text-[var(--text-muted)] mb-2">
               {lang === 'nl' ? 'Dagrecords herstel' : 'Day records repair'}
             </p>
+            <p className="text-xs text-[var(--text-muted)] mb-3">
+              {lang === 'nl'
+                ? 'Stageperiode — gebruikt als fallback voor accounts zonder opgeslagen datums'
+                : 'Internship period — used as fallback for accounts with no saved dates'}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              <input
+                type="date"
+                value={resyncStart}
+                onChange={e => setResyncStart(e.target.value)}
+                className="input text-xs py-1.5 w-36"
+              />
+              <span className="text-xs text-[var(--text-muted)]">→</span>
+              <input
+                type="date"
+                value={resyncEnd}
+                onChange={e => setResyncEnd(e.target.value)}
+                className="input text-xs py-1.5 w-36"
+              />
+            </div>
             <div className="flex items-center gap-3 flex-wrap">
               <button
                 onClick={handleResyncDays}
-                disabled={resyncingDays}
+                disabled={resyncingDays || !resyncStart || !resyncEnd}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-arc-blue/10 text-arc-blue hover:bg-arc-blue/20 border border-arc-blue/20 text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {resyncingDays
