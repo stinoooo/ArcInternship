@@ -15,7 +15,8 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 const DaySchema = new mongoose.Schema({
-  date: { type: String, unique: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
+  date: { type: String, required: true },
   dayOfWeek: Number,
   weekNumber: Number,
   year: Number,
@@ -26,6 +27,8 @@ const DaySchema = new mongoose.Schema({
   activities: { type: String, default: '' },
   isComplete: { type: Boolean, default: false },
 }, { timestamps: true })
+
+DaySchema.index({ date: 1, userId: 1 }, { unique: true, sparse: true })
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema)
 const Day = mongoose.models.Day || mongoose.model('Day', DaySchema)
@@ -42,7 +45,10 @@ function generateWorkingDays(startDate: Date, endDate: Date) {
   while (current <= endDate) {
     const dayOfWeek = current.getDay()
     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      const dateStr = current.toISOString().split('T')[0]
+      const year = current.getFullYear()
+      const month = String(current.getMonth() + 1).padStart(2, '0')
+      const day = String(current.getDate()).padStart(2, '0')
+      const dateStr = `${year}-${month}-${day}`
       days.push({
         date: dateStr,
         dayOfWeek,
@@ -98,9 +104,23 @@ async function seed() {
   )
   console.log('Admin user created/updated')
 
-  // Generate all working days
-  const startDate = new Date('2026-02-09')
-  const endDate = new Date('2026-07-10')
+  // Get the admin user's ID to associate days with them
+  const adminUser = await User.findOne({ email: 'stijn@stinoo.dev' })
+  if (!adminUser) throw new Error('Admin user not found')
+  const adminUserId = adminUser._id
+
+  // Drop any legacy unique index on date alone (without userId) that blocks
+  // multi-user day records and prevents the app from seeding correctly
+  try {
+    await mongoose.connection.collection('days').dropIndex('date_1')
+    console.log('Dropped legacy date_1 unique index')
+  } catch (_e) {
+    // Index may not exist — that is fine
+  }
+
+  // Generate all working days (use T00:00:00 to ensure local time parsing)
+  const startDate = new Date('2026-02-09T00:00:00')
+  const endDate = new Date('2026-07-10T00:00:00')
   const allDays = generateWorkingDays(startDate, endDate)
 
   // Mark week 1 as complete with activities
@@ -115,8 +135,8 @@ async function seed() {
     const isComplete = isWeek1 || isWeek2Complete
 
     await Day.findOneAndUpdate(
-      { date: day.date },
-      { ...day, activities, isComplete },
+      { date: day.date, userId: adminUserId },
+      { ...day, userId: adminUserId, activities, isComplete },
       { upsert: true, new: true }
     )
   }
