@@ -12,21 +12,30 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const sessionUser = session.user as { id?: string; role?: string }
-  const userId = sessionUser.id
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const sessionUserId = sessionUser.id
+  if (!sessionUserId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   await connectToDatabase()
 
   const url = new URL(req.url)
-  const lang = url.searchParams.get('lang') || 'nl'
+  const lang = url.searchParams.get('lang') === 'en' ? 'en' : 'nl'
   const completedOnly = url.searchParams.get('completed') === 'true'
 
-  const query: Record<string, unknown> = { userId }
+  // Guests use the same read-only admin logbook shown on the Days page. Exporting
+  // the guest account itself produces an empty workbook because guests do not own
+  // day records in the single-logbook account model.
+  let targetUserId = sessionUserId
+  if (sessionUser.role === 'guest') {
+    const admin = await User.findOne({ role: 'admin' }, '_id').lean()
+    if (admin) targetUserId = admin._id.toString()
+  }
+
+  const query: Record<string, unknown> = { userId: targetUserId }
   if (completedOnly) query.isComplete = true
 
   const [days, currentUser] = await Promise.all([
     Day.find(query).sort({ date: 1 }),
-    User.findById(userId, 'requiredHours username'),
+    User.findById(targetUserId, 'requiredHours username'),
   ])
 
   const workbook = new ExcelJS.Workbook()
@@ -102,9 +111,12 @@ export async function GET(req: NextRequest) {
   let rowNum = 6
   days.forEach((day, idx) => {
     const isEven = idx % 2 === 0
+    // The ISO date is canonical. Deriving the weekday here prevents stale values
+    // from older seeded records from producing an incorrect day in the export.
+    const dayOfWeek = new Date(`${day.date}T00:00:00`).getDay()
     const row = sheet.addRow([
       formatDate(day.date, lang),
-      getDayName(day.dayOfWeek, lang, true),
+      getDayName(dayOfWeek, lang, true),
       `Week ${day.weekNumber}`,
       typeLabels[lang][day.type] || day.type,
       ['vrij', 'ziek', 'feestdag'].includes(day.type) ? '-' : day.startTime,
