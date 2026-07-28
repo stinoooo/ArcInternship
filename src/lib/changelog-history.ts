@@ -400,4 +400,16 @@ export const CHANGELOG_HISTORY = [
       'Day records repair: override dates entered in the admin panel now always take priority over stored internship dates — a wrongly saved end date could previously prevent Friday from ever being generated',
     ],
   },
+  {
+    version: '5.9.14',
+    date: '2026-07-28',
+    nl: [
+      'Exports bevatten weer de geregistreerde activiteiten en tonen voor elke datum de juiste dag',
+      'Exports vanuit een alleen-lezen account gebruiken nu hetzelfde stagelogboek als het dagenoverzicht',
+    ],
+    en: [
+      'Exports once again include registered activities and show the correct day for every date',
+      'Exports from a read-only account now use the same internship logbook as the days overview',
+    ],
+  },
 ]
